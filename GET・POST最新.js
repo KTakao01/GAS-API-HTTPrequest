@@ -1,6 +1,6 @@
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var sht = ss.getSheetByName('リクエストsample');
-
+Logger.log(sht.getLastRow()+100);
 var methodsArray = sht.getRange(2,2,sht.getLastRow()-1).getValues();　//複数セルの値を取得する - getValues -
 
 var idsArray = sht.getRange(2,1,sht.getLastRow()-1).getValues();
@@ -12,7 +12,7 @@ Logger.log(idsArray);//[[1.0], [2.0], [3.0]] //rowNumber= ids+１(最初の行�
 var methodArray = methodsArray.flat();
 var idArray = idsArray.flat();
 
-Logger.log(methodArray);//	[POST, POST, GET, ]
+//Logger.log(methodArray);//	[POST, POST, GET, ]
 Logger.log(idArray);//[1.0, 2.0, 3.0, ] //rowNumber= id+１(最初の行は見出しなのでカウントしない)//rownumber = [2,3,4]だと好都合
 var id = 0;
 var　method = "";
@@ -25,10 +25,10 @@ for(var k=0;k<idArray.length;k++){
 var id = idArray[k];
 var method = methodArray[k];
 
-Logger.log(method);//	[POST, POST, GET]
-Logger.log(id);
+//Logger.log(method);//	[POST, POST, GET]
+//Logger.log(id);
 var rowNumber = id + 1;
-Logger.log(rowNumber+10);
+//Logger.log(rowNumber+10);
 
 if(method == "GET") {
   sendGetRequest()
