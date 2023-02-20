@@ -1,26 +1,25 @@
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var sht = ss.getSheetByName('リクエストsample');
 
-///（,,56)として固定or(,,i)としてループさせる予定
 var methodsArray = sht.getRange(2,2,sht.getLastRow()).getValues();　//複数セルの値を取得する - getValues -
 
-var idsArray = sht.getRange(2,1,sht.getLastRow()).getValues()
+var idsArray = sht.getRange(2,1,sht.getLastRow()).getValues();
 
-//Logger.log(methods);//[[POST], [POST], [GET]]
-//Logger.log(ids);//[1.0], [2.0], [3.0] //rowNumber= ids+１(最初の行は見出しなのでカウントしない)
+Logger.log(methodArray);//[[POST], [POST], [GET]]
+Logger.log(idArray);//[1.0], [2.0], [3.0] //rowNumber= ids+１(最初の行は見出しなのでカウントしない)
 
 //methodsArrayとidsArrayを１次配列に変換する
 var methodArray = methodsArray.flat();
 var idArray = idsArray.flat();
 
-//Logger.log(methodArray);//	[POST, POST, GET]
-//Logger.log(idArray);//[1.0, 2.0, 3.0] //rowNumber= id+１(最初の行は見出しなのでカウントしない)//rownumber = [2,3,4]だと好都合
+Logger.log(methodArray);//	[POST, POST, GET, ]
+Logger.log(idArray);//[1.0, 2.0, 3.0, ] //rowNumber= id+１(最初の行は見出しなのでカウントしない)//rownumber = [2,3,4]だと好都合
 var id = 0;
 var　method = "";
 
 
 
-function sendRequesttest(){
+function sendRequesttesttest1(){
 
 for(var k=0;k<idArray.length;k++){
 var id = idArray[k];
@@ -139,6 +138,7 @@ function sendPostRequest() {
 
   console.log(response.getContentText())
   console.log(response.getResponseCode())
-
+Logger.log(idArray);
  }
+ Logger.log(idArray);
 }
