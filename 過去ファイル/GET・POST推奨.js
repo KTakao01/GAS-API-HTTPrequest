@@ -1,35 +1,29 @@
+function sendRequesttesttest(){
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var sht = ss.getSheetByName('リクエストsample');
+//test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
 
-var methodsArray = sht.getRange(2,2,sht.getLastRow()).getValues();　//複数セルの値を取得する - getValues -
+//複数セルの値を二次元配列として取得する - getValues -
+var methodsArray = sht.getRange(2,2,sht.getLastRow()-1).getValues();　
+var idsArray = sht.getRange(2,1,sht.getLastRow()-1).getValues();
+//Logger.log(methodsArray);//[[POST], [POST], [GET]]
+//Logger.log(idsArray);//[[1.0], [2.0], [3.0]] //rowNumber= ids+１(最初の行は見出しなのでカウントしない)
 
-var idsArray = sht.getRange(2,1,sht.getLastRow()).getValues();
-
-Logger.log(methodArray);//[[POST], [POST], [GET]]
-Logger.log(idArray);//[1.0], [2.0], [3.0] //rowNumber= ids+１(最初の行は見出しなのでカウントしない)
-
-//methodsArrayとidsArrayを１次配列に変換する
+//取得した二次元配列：methodsArrayとidsArrayを１次配列に変換する
 var methodArray = methodsArray.flat();
 var idArray = idsArray.flat();
-
-Logger.log(methodArray);//	[POST, POST, GET, ]
-Logger.log(idArray);//[1.0, 2.0, 3.0, ] //rowNumber= id+１(最初の行は見出しなのでカウントしない)//rownumber = [2,3,4]だと好都合
+//test　//id取得できているかの確認、後に行数に変換する.rownumberとして定義する。
+//Logger.log(idArray);//[1.0, 2.0, 3.0] //rowNumber= id+１(最初の行は見出しなのでカウントしない)//rownumber = [2,3,4]だと好都合
 var id = 0;
 var　method = "";
-
-
-
-function sendRequesttesttest1(){
-
 for(var k=0;k<idArray.length;k++){
 var id = idArray[k];
 var method = methodArray[k];
 
-Logger.log(method);//	[POST, POST, GET]
-Logger.log(id);
+//検証//Logger.log(method);//	[POST, POST, GET]
+//検証//Logger.log(id);
 var rowNumber = id + 1;
-Logger.log(rowNumber+10);
-
+//検証//Logger.log(rowNumber+10);
 if(method == "GET") {
   sendGetRequest()
 } 
@@ -40,43 +34,39 @@ else if(method == "POST"){
 
 
 function sendGetRequest() {
-//スプレッドシートを開いて取得
-var ss = SpreadsheetApp.getActiveSpreadsheet();
-//データsampleシートを指定
-var sht = ss.getSheetByName("リクエストsample");
-//ｇｅtvalueでgetrangeの値を取得
-
-// セル範囲の値を２次元配列で取得する
+//getvalueでgetrangeの値を取得
+// セル範囲の値（ここではURL）を２次元配列で取得する
 var value = sht.getRange(rowNumber,3).getValues();
-// セル範囲の値を１次元配列に変換する
+// セル範囲の値（ここではURL）を１次元配列に変換する
 var valuesFlat = value.flat()
-
-console.log(valuesFlat)
+//検証//console.log(valuesFlat)
   while (valuesFlat.length){
       var Elem = valuesFlat.shift(); 
+      //一次元配列からURLテキスト抽出
       Logger.log(Elem)
-      var response = UrlFetchApp.fetch(Elem);
+
+  var options = {
+    'method' : 'get',
+    "muteHttpExceptions" : true,
+    };
+
+
+  var response = UrlFetchApp.fetch(Elem,options);
   console.log(response.getContentText())
   console.log(response.getResponseCode())
   }
 }
 
-
-
-
 //入力のある行のパラメータを取得
 function sendPostRequest() {
   //パラメータの一覧keyを取得
 
-    let mySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('リクエストsample');
-  
-    const range = mySheet.getRange(1, 4, 1 ,mySheet.getLastColumn()-3)
+    const range = sht.getRange(1, 4, 1 ,sht.getLastColumn()-3)
     const keys2array = range.getValues() 
     var keyFlat = keys2array.flat()
  
-  //パラメータの内容valueを取得
-  
-    const rangeParam = mySheet.getRange(rowNumber, 4, 1, mySheet.getLastColumn()-3)
+  //パラメータの内容valueを取得  
+    const rangeParam = sht.getRange(rowNumber, 4, 1, sht.getLastColumn()-3)
     const values2array = rangeParam.getValues() 
     var valueFlat = values2array.flat()
 
@@ -86,7 +76,6 @@ function sendPostRequest() {
   
   //console.log(obj2array); 
   
-
    
   //key-valueの二次元配列から連想配列への変換 
 　  const keys = obj2array[0];
@@ -98,11 +87,15 @@ function sendPostRequest() {
       obj[keys[j]] = values[j];}
       else {
       }
-     //URLを配列で取得
-    const val = mySheet.getRange(rowNumber,3).getValues();  // B列の全ての行を取得
+     //URLを二次元配列で取得
+    const val = sht.getRange(rowNumber,3).getValues();  // B列の全ての行を取得
   //  const numberOfValues = val.filter(String).length; // 空以外の配列の数を数える
+  
+  //ループはsendRequest()で回すので不要
   //  const urls = mySheet.getRange(2,2,numberOfValues-1).getValues();   
    // var urlFlat = urls.flat()
+  
+  //URLの二次元配列を一次元配列に変換
     var urlFlat = val.flat()
     //console.log(urlFlat);
     //URL配列からURLを抽出
@@ -127,7 +120,8 @@ function sendPostRequest() {
     'method' : 'post',
     'contentType': 'application/json',
     // Convert the JavaScript object to a JSON string.
-    'payload' : string
+    'payload' : string,
+    "muteHttpExceptions" : true,
     };
  
 

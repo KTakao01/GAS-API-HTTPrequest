@@ -1,3 +1,4 @@
+//書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
 function main() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sht = ss.getSheetByName('リクエストsample 修正1');
@@ -19,24 +20,33 @@ function main() {
   for (var k = 0; k < idArray.length; k++) {
     var id = idArray[k];
     var method = methodArray[k];
-
-    //検証//Logger.log(method);//	[POST, POST, GET]
+        //検証//Logger.log(method);//	[POST, POST, GET]
     //検証//Logger.log(id);
     var rowNumber = id + 1;
     //検証//Logger.log(rowNumber+10);
 
+    //書き込み先セルを文字列で取得
+    //var writtenCell = "E" + String(rowNumber)
+    //rowNumberあるので不要
+
     if (method == "GET") {
       sendGetRequest(sht,rowNumber);
-      const {getMessage,getStatusCode} = sendGetRequest(sht,rowNumber);
-      console.log(getStatusCode); 
+      
+      //sendGetRequest()の返却値：レスポンスメッセージとステータスコードをメイン関数で再利用する。
+      //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
+      //const {getMessage,getStatusCode} = sendGetRequest(sht,rowNumber);
+     
+
+      //検証//console.log(getStatusCode); 
     }
     else if (method == "POST") {
-      sendPostRequest(sht,rowNumber)
+      sendPostRequest(sht,rowNumber);
+
     }
   }
 }
 
-
+//書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
 function sendGetRequest(sht,rowNumber) {
   //getvalueでgetrangeの値を取得
   // セル範囲の値（ここではURL）を２次元配列で取得する
@@ -45,9 +55,9 @@ function sendGetRequest(sht,rowNumber) {
   var valuesFlat = value.flat()
   //検証//console.log(valuesFlat)
   while (valuesFlat.length) {
-    var Elem = valuesFlat.shift();
+    var getUrl = valuesFlat.shift();
     //一次元配列からURLテキスト抽出
-    Logger.log(Elem)
+    Logger.log(getUrl)
 
     var options = {
       'method': 'get',
@@ -55,41 +65,44 @@ function sendGetRequest(sht,rowNumber) {
     };
 
 
-    var response = UrlFetchApp.fetch(Elem, options);
+    var response = UrlFetchApp.fetch(getUrl, options);
     var getMessage= response.getContentText();
     var getStatusCode = response.getResponseCode();
     //console.log(response.getContentText())
     //console.log(response.getResponseCode())
     console.log(getMessage);
     console.log(getStatusCode);  
-    return {getMessage,getStatusCode};
+    //return {getMessage,getStatusCode};
+     sht.getRange(rowNumber,5).setValue(getStatusCode);
   }
 }
 
-//入力のある行のパラメータを取得
+//書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
 function sendPostRequest(sht,rowNumber) {
-  //パラメータの一覧keyを取得
+  //パラメータの一覧keyを2次元配列として取得。1次元配列へ変換して配列要素抽出
   const range = sht.getRange(1, 8, 1, sht.getLastColumn() - 7)
   const keys2array = range.getValues()
+  //Logger.log(keys2array);
   var keyFlat = keys2array.flat()
+  //console.log(keyFlat);
 
-  //パラメータの内容valueを取得  
+  //パラメータの内容valueを2次元配列として取得。1次元配列へ変換して配列要素抽出
   const rangeParam = sht.getRange(rowNumber, 8, 1, sht.getLastColumn() - 7)
   const values2array = rangeParam.getValues()
   var valueFlat = values2array.flat()
 
-  //key-valueを対応させる
+  //key-valueの各要素を対応させる
   //key-valueの二次元配列を作成する
   var obj2array = [keyFlat, valueFlat];
 
   //console.log(obj2array); 
-
-
   //key-valueの二次元配列から連想配列への変換 
   const keys = obj2array[0];
   const values = obj2array[1];
   var obj = {};
+
   // 空valueの削除
+  //入力のある行のパラメータを取得
   for (let j = 0; j <= keys.length; j++) {
     if (values[j] !== "") {
       obj[keys[j]] = values[j];
@@ -97,19 +110,19 @@ function sendPostRequest(sht,rowNumber) {
     else {
     }
     //URLを二次元配列で取得
-    const val = sht.getRange(rowNumber, 7).getValues();  // G列:URLカラムの全ての行を取得
+    const urlPostArray = sht.getRange(rowNumber, 7).getValues();  // G列:URLカラムの全ての行を取得
 
     //URLの二次元配列を一次元配列に変換
-    var urlFlat = val.flat()
-    //console.log(urlFlat);
+    var urlPostFlat = urlPostArray.flat()
+    //console.log(urlPostFlat);
 
     //URL配列からURLを抽出
-    var url = urlFlat[0];
+    var urlPost = urlPostFlat[0];
 
   }
 
   //検証//console.log(obj);
-  console.log(url);
+  console.log(urlPost);
 
   //key-value配列のJSON化
   var string = JSON.stringify(obj)
@@ -125,7 +138,7 @@ function sendPostRequest(sht,rowNumber) {
   };
 
   //POSTリクエスト　url
-  var postResponse = UrlFetchApp.fetch(url, options);
+  var postResponse = UrlFetchApp.fetch(urlPost, options);
   var postMessage = postResponse.getContentText();
   var postStatusCode = postResponse.getResponseCode();
   //console.log(response.getContentText())
