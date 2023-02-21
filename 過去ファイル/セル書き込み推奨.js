@@ -1,5 +1,15 @@
+//スプシ起動時にステータスコード書き込みが自動実行される
+//うまくいかないので削除　GUI設定と見比べて確認する
+//function onOpen(){
+//  let spreadSheetId = "1lVGVd2ntQluS7HvClfesWT3KEXpufZCMOrQCcCm4czw"
+  //ScriptApp.newTrigger(main)
+   // .ss
+    //.onOpen()
+    //.create();
+//}
+
 //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
-function main() {
+function main(ss) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sht = ss.getSheetByName('リクエストsample 修正1');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
@@ -30,17 +40,20 @@ function main() {
     //rowNumberあるので不要
 
     if (method == "GET") {
-      //sendGetRequest(sht,rowNumber);
+      //sendGetRequest(sht,rowNumber);//重複するので削除
       
       //sendGetRequest()の返却値：レスポンスメッセージとステータスコードをメイン関数で再利用する。
       //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
       const {getMessage,getStatusCode} = sendGetRequest(sht,rowNumber);
       sht.getRange(rowNumber,5).setValue(getStatusCode);
 
+
       //検証//console.log(getStatusCode); 
     }
     else if (method == "POST") {
-      sendPostRequest(sht,rowNumber);
+      //sendPostRequest(sht,rowNumber);//重複するので削除
+      const {postMessage,postStatusCode} = sendPostRequest(sht,rowNumber);
+      sht.getRange(rowNumber,5).setValue(postStatusCode);
 
     }
   }
@@ -73,6 +86,7 @@ function sendGetRequest(sht,rowNumber) {
     console.log(getMessage);
     console.log(getStatusCode);  
     return {getMessage,getStatusCode};
+     
   }
 }
 
@@ -109,10 +123,10 @@ function sendPostRequest(sht,rowNumber) {
     else {
     }
     //URLを二次元配列で取得
-    const urlPostArray = sht.getRange(rowNumber, 7).getValues();  // G列:URLカラムの全ての行を取得
+    const urlPost2Array = sht.getRange(rowNumber, 7).getValues();  // G列:URLカラムの全ての行を取得
 
     //URLの二次元配列を一次元配列に変換
-    var urlPostFlat = urlPostArray.flat()
+    var urlPostFlat = urlPost2Array.flat()
     //console.log(urlPostFlat);
 
     //URL配列からURLを抽出

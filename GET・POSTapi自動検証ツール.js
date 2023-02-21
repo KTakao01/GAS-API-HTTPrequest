@@ -1,5 +1,14 @@
+//スプシ起動時にステータスコード書き込みが自動実行される
+function onOpen(){
+ // const main = main(ss) ;
+  //const sId = '1lVGVd2ntQluS7HvClfesWT3KEXpufZCMOrQCcCm4czw'
+  //var ss1 = SpreadsheetApp.openById(sId);
+  var ssId = SpreadsheetApp.getActiveSpreadsheet().getId();
+  var autoRun = ScriptApp.newTrigger(main()).forSpreadsheet(ssId).onOpen().create();
+}
+
 //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
-function main1() {
+function main() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sht = ss.getSheetByName('リクエストsample 修正1');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
