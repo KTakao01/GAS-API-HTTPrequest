@@ -1,5 +1,5 @@
 //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
-function main1() {
+function main() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sht = ss.getSheetByName('リクエストsample 修正1');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
@@ -34,9 +34,8 @@ function main1() {
       
       //sendGetRequest()の返却値：レスポンスメッセージとステータスコードをメイン関数で再利用する。
       //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
-      const {getMessage,getStatusCode} = sendGetRequest(sht,rowNumber);
-     sht.getRange(rowNumber,5).setValue(getStatusCode);
-
+      //const {getMessage,getStatusCode} = sendGetRequest(sht,rowNumber);
+     
 
       //検証//console.log(getStatusCode); 
     }
@@ -73,8 +72,8 @@ function sendGetRequest(sht,rowNumber) {
     //console.log(response.getResponseCode())
     console.log(getMessage);
     console.log(getStatusCode);  
-    return {getMessage,getStatusCode};
-     
+    //return {getMessage,getStatusCode};
+     sht.getRange(rowNumber,5).setValue(getStatusCode);
   }
 }
 
@@ -111,10 +110,10 @@ function sendPostRequest(sht,rowNumber) {
     else {
     }
     //URLを二次元配列で取得
-    const urlPost2Array = sht.getRange(rowNumber, 7).getValues();  // G列:URLカラムの全ての行を取得
+    const urlPostArray = sht.getRange(rowNumber, 7).getValues();  // G列:URLカラムの全ての行を取得
 
     //URLの二次元配列を一次元配列に変換
-    var urlPostFlat = urlPost2Array.flat()
+    var urlPostFlat = urlPostArray.flat()
     //console.log(urlPostFlat);
 
     //URL配列からURLを抽出
