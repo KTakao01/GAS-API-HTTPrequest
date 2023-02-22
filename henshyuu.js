@@ -1,15 +1,16 @@
 //スプシ起動時にステータスコード書き込みが自動実行される
-function autoRun() {
-  // const main = main(ss) ;
-  //const ssId = '1lVGVd2ntQluS7HvClfesWT3KEXpufZCMOrQCcCm4czw'
+function onOpen(){
+　 // const main = main(ss) ;
+  //const sId = '1lVGVd2ntQluS7HvClfesWT3KEXpufZCMOrQCcCm4czw'
   //var ss1 = SpreadsheetApp.openById(sId);
-  const ssId = SpreadsheetApp.getActiveSpreadsheet().getId();
-  ScriptApp.newTrigger("main").forSpreadsheet(ssId).onOpen().create();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ssId = ss.getId();
+  var autoRun = ScriptApp.newTrigger(main(ss)).forSpreadsheet(ssId).onOpen().create();
 }
 
 //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
-function main() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+function main(ss) {
+  
   var sht = ss.getSheetByName('オートメーションテストa');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
 
@@ -29,7 +30,7 @@ function main() {
   for (var k = 0; k < idArray.length; k++) {
     var id = idArray[k];
     var method = methodArray[k];
-    //検証//Logger.log(method);//	[POST, POST, GET]
+        //検証//Logger.log(method);//	[POST, POST, GET]
     //検証//Logger.log(id);
     var rowNumber = id + 1;
     //検証//Logger.log(rowNumber+10);
@@ -40,26 +41,26 @@ function main() {
 
     if (method == "GET") {
       //sendGetRequest(sht,rowNumber);//重複するので削除
-
+      
       //sendGetRequest()の返却値：レスポンスメッセージとステータスコードをメイン関数で再利用する。
       //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
-      const { getMessage, getStatusCode } = sendGetRequest(sht, rowNumber);
-      sht.getRange(rowNumber, 5).setValue(getStatusCode);
+      const {getMessage,getStatusCode} = sendGetRequest(sht,rowNumber);
+      sht.getRange(rowNumber,5).setValue(getStatusCode);
 
 
       //検証//console.log(getStatusCode); 
     }
     else if (method == "POST") {
       //sendPostRequest(sht,rowNumber);//重複するので削除
-      const { postMessage, postStatusCode } = sendPostRequest(sht, rowNumber);
-      sht.getRange(rowNumber, 5).setValue(postStatusCode);
+      const {postMessage,postStatusCode} = sendPostRequest(sht,rowNumber);
+      sht.getRange(rowNumber,5).setValue(postStatusCode);
 
     }
   }
 }
 
 //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
-function sendGetRequest(sht, rowNumber) {
+function sendGetRequest(sht,rowNumber) {
   //getvalueでgetrangeの値を取得
   // セル範囲の値（ここではURL）を２次元配列で取得する
   var value = sht.getRange(rowNumber, 7).getValues();
@@ -78,19 +79,19 @@ function sendGetRequest(sht, rowNumber) {
 
 
     var response = UrlFetchApp.fetch(getUrl, options);
-    var getMessage = response.getContentText();
+    var getMessage= response.getContentText();
     var getStatusCode = response.getResponseCode();
     //console.log(response.getContentText())
     //console.log(response.getResponseCode())
     console.log(getMessage);
-    console.log(getStatusCode);
-    return { getMessage, getStatusCode };
-
+    console.log(getStatusCode);  
+    return {getMessage,getStatusCode};
+     
   }
 }
 
 //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
-function sendPostRequest(sht, rowNumber) {
+function sendPostRequest(sht,rowNumber) {
   //パラメータの一覧keyを2次元配列として取得。1次元配列へ変換して配列要素抽出
   const range = sht.getRange(1, 8, 1, sht.getLastColumn() - 7)
   const keys2array = range.getValues()
@@ -158,6 +159,6 @@ function sendPostRequest(sht, rowNumber) {
   //テスト//Logger.log(idArray);
   console.log(postMessage);
   console.log(postStatusCode);
-  return { postMessage, postStatusCode };
+  return {postMessage,postStatusCode};
 }
   //テスト//Logger.log(idArray);
