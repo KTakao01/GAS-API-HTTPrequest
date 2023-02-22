@@ -12,14 +12,9 @@
 
 //スプシ起動時にステータスコード書き込みを自動実行するトリガーを作成//一度作成後は使用しない。同じトリガーを複製してしまうので
 //トリガーがなくなればアンコメントして再度実行する。
-//function onOpen(){
-
-
 //var ss = SpreadsheetApp.getActiveSpreadsheet();
 //var ssId = ss.getId();
 //var autoRun = ScriptApp.newTrigger("main").forSpreadsheet(ssId).onOpen().create();
-
-//}
 
 
 
@@ -91,22 +86,16 @@ function sendGetRequest(sht, rowNumber) {
   //console.log(getApi);
   //console.log(getCombi);
 
-
-
   //一次元配列からURLテキスト抽出
   while (urlValuesFlat.length) {
     var getUrl = urlValuesFlat.shift();
-
-
 
     var options = {
       'method': 'get',
       "muteHttpExceptions": true,
     };
 
-
-
-    //レスポンス返却
+    //レスポンス
     var response = UrlFetchApp.fetch(getUrl, options);
     var getMessage = response.getContentText();
     var getStatusCode = String(response.getResponseCode());
@@ -147,7 +136,6 @@ function sendPostRequest(sht, rowNumber) {
   const values = obj2array[1];
   var obj = {};
 
-
   //入力のあるパラメータを取得.valueが空の時はkeyが削除される
   for (let j = 0; j <= keys.length; j++) {
     if (values[j] !== "") {
@@ -164,16 +152,12 @@ function sendPostRequest(sht, rowNumber) {
 
     //URL配列からURLを抽出
     var urlPost = urlPostFlat[0];
-
   }
 
   
-  
-
   //key-value配列のJSON化
   var string = JSON.stringify(obj)
   
-
   //POSTリクエスト　parameter
   var options = {
     'method': 'post',
@@ -186,18 +170,18 @@ function sendPostRequest(sht, rowNumber) {
   //POSTリクエスト　urlと合わせて送信
   var postResponse = UrlFetchApp.fetch(urlPost, options);
 
-
   //ログ排出用にapi,組み合わせカラムのバリューを取得する。
   var postApi = sht.getRange(rowNumber, 3).getValue();
   var postCombi = sht.getRange(rowNumber, 4).getValue();
-
-
+  
+  //レスポンス
   var postMessage = postResponse.getContentText();
   var postStatusCode = String(postResponse.getResponseCode());
   //console.log(response.getContentText())
   //console.log(response.getResponseCode())
   //テスト//Logger.log(idArray);
 
+  //リクエストとレスポンスのログ排出
   console.log(postApi + "についてaccess_tokenとuser_idの組み合わせが" + postCombi + "の時、リクエストとレスポンスは以下の通りです。※エンドポイント、JSONペイロード、レスポンスメッセージ、ステータスコードの順に記載")
   console.log(urlPost);
   console.log(string);
