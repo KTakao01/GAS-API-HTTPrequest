@@ -11,12 +11,14 @@ Logger.log('Current project has ' + ScriptApp.getProjectTriggers().length + ' tr
 
 
 //スプシ起動時にステータスコード書き込みを自動実行するトリガーを作成//一度作成後は使用しない。同じトリガーを複製してしまうので
+//トリガーがなくなればアンコメントして再度実行する。
 //function onOpen(){
-//メモ//const sId = '1lVGVd2ntQluS7HvClfesWT3KEXpufZCMOrQCcCm4czw'
-//メモ//var ss1 = SpreadsheetApp.openById(sId);
+
+
 //var ss = SpreadsheetApp.getActiveSpreadsheet();
 //var ssId = ss.getId();
 //var autoRun = ScriptApp.newTrigger("main").forSpreadsheet(ssId).onOpen().create();
+
 //}
 
 
@@ -36,6 +38,8 @@ function main() {
   //取得した二次元配列：methodsArrayとidsArrayを１次配列に変換する
   var methodArray = methodsArray.flat();
   var idArray = idsArray.flat();
+  
+ 
   //test　//id取得できているかの確認、後に行数に変換する.rownumberとして定義する。
   //Logger.log(idArray);//[1.0, 2.0, 3.0] //rowNumber= id+１(最初の行は見出しなのでカウントしない)//rownumber = [2,3,4]だと好都合
   var id = 0;
@@ -76,28 +80,44 @@ function main() {
 function sendGetRequest(sht, rowNumber) {
   //getvalueでgetrangeの値を取得
   // セル範囲の値（ここではURL）を２次元配列で取得する
-  var value = sht.getRange(rowNumber, 7).getValues();
+  var urlValue = sht.getRange(rowNumber, 7).getValues();
   // セル範囲の値（ここではURL）を１次元配列に変換する
-  var valuesFlat = value.flat()
+  var urlValuesFlat = urlValue.flat()
   //検証//console.log(valuesFlat)
-  while (valuesFlat.length) {
-    var getUrl = valuesFlat.shift();
-    //一次元配列からURLテキスト抽出
-    Logger.log(getUrl)
+
+  //ログ排出用にapi,組み合わせカラムのバリューを取得する。1次元配列へ変換する。
+  var getApi = sht.getRange(rowNumber,3).getValue();
+  var getCombi = sht.getRange(rowNumber,4).getValue();
+  //console.log(getApi);
+  //console.log(getCombi);
+
+
+
+  //一次元配列からURLテキスト抽出
+  while (urlValuesFlat.length) {
+    var getUrl = urlValuesFlat.shift();
+   
+
 
     var options = {
       'method': 'get',
       "muteHttpExceptions": true,
     };
 
+  
 
+    //レスポンス返却
     var response = UrlFetchApp.fetch(getUrl, options);
     var getMessage = response.getContentText();
     var getStatusCode = response.getResponseCode();
     //console.log(response.getContentText())
     //console.log(response.getResponseCode())
+
+    console.log(getApi + "についてaccess_tokenとuser_idの組み合わせが" + getCombi + "の時、リクエストとレスポンスは以下の通りです。" )
+    console.log(getUrl);
     console.log(getMessage);
     console.log(getStatusCode);
+    
     return { getMessage, getStatusCode };
 
   }
