@@ -1,16 +1,30 @@
-//スプシ起動時にステータスコード書き込みが自動実行される
-function autoRun() {
-  // const main = main(ss) ;
-  //const ssId = '1lVGVd2ntQluS7HvClfesWT3KEXpufZCMOrQCcCm4czw'
-  //var ss1 = SpreadsheetApp.openById(sId);
-  const ssId = SpreadsheetApp.getActiveSpreadsheet().getId();
-  ScriptApp.newTrigger("main").forSpreadsheet(ssId).onOpen().create();
-}
+ //Deletes all triggers in the current project.//過去のトリガーが残って処理が遅くなるときに利用する
+//function triggerdele() {
+//  var triggers = ScriptApp.getProjectTriggers();
+//  for (var i = 0; i < triggers.length; i++) {
+//    ScriptApp.deleteTrigger(triggers[i]);
+//  }
+//}
+
+//有効なトリガーを取得する
+Logger.log('Current project has ' + ScriptApp.getProjectTriggers().length + ' triggers.');
+
+
+//スプシ起動時にステータスコード書き込みを自動実行するトリガーを作成//一度作成後は使用しない。同じトリガーを複製してしまうので
+//function onOpen(){
+//メモ//const sId = '1lVGVd2ntQluS7HvClfesWT3KEXpufZCMOrQCcCm4czw'
+//メモ//var ss1 = SpreadsheetApp.openById(sId);
+//var ss = SpreadsheetApp.getActiveSpreadsheet();
+//var ssId = ss.getId();
+//var autoRun = ScriptApp.newTrigger("main").forSpreadsheet(ssId).onOpen().create();
+//}
+
+
 
 //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
 function main() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sht = ss.getSheetByName('オートメーションテストa');
+  var sht = ss.getSheetByName('オートメーションテスト');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
 
   //複数セルの値を二次元配列として取得する - getValues -
