@@ -329,14 +329,14 @@ function referenceAuthtest6() {
             //console.log(dataToken)
             //console.log(dataId)//18
 
-            var count = col;
+            var count = col + 11;
             console.log(count);
             //for (count = 0; count < referredKey1array.length; count++) {
             console.log("参照APIパラメーターのkeyのうち" + referredKey1array[count] + "について、以下の通り上書き処理の準備を行います。")
-            var countLog = count + 1
+            var countLog = count + 12
 
             //認証APIのuser_idバリューが存在していて、参照APIのキー配列に認証APIのuser_idキーが一致するところで、認証APIのuser_idバリューを渡す
-            if (referValueUserId != "" && referredKey1array[count] == referKeyUserId) {
+            if (referValueUserId != "" && referredKey1array[col] == referKeyUserId) {
 
               console.log("user_idのkeyです。" + referredValueRowNumber + "行" + countLog + "列のセルの書き込み処理を行う予定です。");
               lineArray[referredValueRowNumber - 1][count] = referValueUserId
@@ -348,7 +348,7 @@ function referenceAuthtest6() {
               //console.log(lineArray)
             }
             //認証APIのaccess_tokenバリューが存在していて、参照APIのキー配列に認証APIのaccess_tokenキーが一致するところで、認証APIのaccess_tokenバリューを渡す
-            else if (referValueAccessToken != "" && referredKey1array[count] == referKeyAccessToken) {
+            else if (referValueAccessToken != "" && referredKey1array[col] == referKeyAccessToken) {
               console.log("access_tokenのkeyです。" + referredValueRowNumber + "行" + countLog + "列のセルの書き込み処理を行う予定です。");
               //console.log(count)
               //console.log(1)
@@ -394,8 +394,9 @@ function referenceAuthtest6() {
 
 
   //}
-  //console.log(lineArray)
-
+  console.log(lineArray[17][1])
+  
+  console.log(lineArray[17][0])
   console.log("認証を必要とする参照APIパラメーターのkeyのうち、user_idとaccess_tokenについて認証APIのvalueの値を書き込みます")
   //console.log("user_idのの書き込み処理を行います。");
   //console.log("access_tokenの書き込み処理を行います。");
