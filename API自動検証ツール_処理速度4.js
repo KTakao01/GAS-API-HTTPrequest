@@ -288,10 +288,11 @@ function referenceAuthtest6() {
         else if (lineArray[referredValueRowNumber - 1][col] == "") {
           lineArray[referredValueRowNumber - 1][col] = null
 
-          console.log("ジャグ配列の最大数に揃うように、空白セル" + referredKeyRowNumber + "行" + colLog + "列にnullを代入しています。")
+          console.log("ジャグ配列の最大数に揃うように、空白セル" + referredValueRowNumber + "行" + colLog + "列にnullを代入しています。")
         }
         else {
           console.log(referredKeyRowNumber + "行" + colLog + "列の既存の値を取得しています。")
+          console.log(referredValueRowNumber + "行" + colLog + "列の既存の値を取得しています。")
         }
 
 
@@ -398,6 +399,7 @@ function referenceAuthtest6() {
 
 
   //}
+  console.log(lineArray)
   console.log(lineArray[17][10])
   
   console.log(lineArray[17][11])
