@@ -281,6 +281,7 @@ function referenceAuthtest6() {
         lineArray[referredKeyRowNumber - 1][col] = sht.getRange(referredKeyRowNumber, col + 1).getValue();
         lineArray[referredValueRowNumber - 1][col] = sht.getRange(referredValueRowNumber, col + 1).getValue();
         if (lineArray[referredKeyRowNumber - 1][col] == "") {
+          console.log("ジャグ配列の最大数に揃うように、空白セル"+ referredKeyRowNumber + "行" + colLog + "列にnullを代入しています。")
           lineArray[referredKeyRowNumber - 1][col] = null
         }
         else if (lineArray[referredValueRowNumber - 1][col] == "") {
