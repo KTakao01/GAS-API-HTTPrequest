@@ -277,19 +277,19 @@ function referenceAuthtest6() {
       //全ての列を取得する
       //取得した行の配列に空白があれば、nullを入れる
       for (col = startJ; col < numJ; col++) {
-
+        var colLog = col + 1
         lineArray[referredKeyRowNumber - 1][col] = sht.getRange(referredKeyRowNumber, col + 1).getValue();
         lineArray[referredValueRowNumber - 1][col] = sht.getRange(referredValueRowNumber, col + 1).getValue();
-        if (lineArray[referredKeyRowNumber - 1][col] == "" ) {
+        if (lineArray[referredKeyRowNumber - 1][col] == "") {
           lineArray[referredKeyRowNumber - 1][col] = null
         }
-        else if(lineArray[referredValueRowNumber - 1][col] == ""){
+        else if (lineArray[referredValueRowNumber - 1][col] == "") {
           lineArray[referredValueRowNumber - 1][col] = null
-          var colLog = col +1
+
           console.log("ジャグ配列の最大数に揃うように、空白セル" + referredKeyRowNumber + "行" + colLog + "列にnullを代入しています。")
         }
         else {
-          console.log(referredKeyRowNumber + "行" + colLog +"列の既存の値を取得しています。")
+          console.log(referredKeyRowNumber + "行" + colLog + "列の既存の値を取得しています。")
         }
 
 
@@ -334,7 +334,7 @@ function referenceAuthtest6() {
           var countLog = count + 1
           //認証APIのuser_idバリューが存在していて、参照APIのキー配列に認証APIのuser_idキーが一致するところで、認証APIのuser_idバリューを渡す
           if (referValueUserId != "" && referredKey1array[count] == referKeyUserId) {
-    
+
             console.log("user_idのkeyです。" + referredValueRowNumber + "行" + countLog + "列のセルの書き込み処理を行う予定です。");
             lineArray[referredValueRowNumber - 1][count] = referValueUserId
             //console.log(referValueRowNumber)
@@ -388,8 +388,8 @@ function referenceAuthtest6() {
 
 
   //}
-//console.log(lineArray)
-         
+  //console.log(lineArray)
+
   console.log("認証を必要とする参照APIパラメーターのkeyのうち、user_idとaccess_tokenについて認証APIのvalueの値を書き込みます")
   //console.log("user_idのの書き込み処理を行います。");
   //console.log("access_tokenの書き込み処理を行います。");
