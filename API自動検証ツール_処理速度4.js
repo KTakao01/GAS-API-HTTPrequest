@@ -332,8 +332,8 @@ function referenceAuthtest6() {
             var count = col + 11;
             console.log(count);
             //for (count = 0; count < referredKey1array.length; count++) {
-            console.log("参照APIパラメーターのkeyのうち" + referredKey1array[count] + "について、以下の通り上書き処理の準備を行います。")
-            var countLog = count + 12
+            console.log("参照APIパラメーターのkeyのうち" + referredKey1array[col] + "について、以下の通り上書き処理の準備を行います。")
+            var countLog = col + 12
 
             //認証APIのuser_idバリューが存在していて、参照APIのキー配列に認証APIのuser_idキーが一致するところで、認証APIのuser_idバリューを渡す
             if (referValueUserId != "" && referredKey1array[col] == referKeyUserId) {
