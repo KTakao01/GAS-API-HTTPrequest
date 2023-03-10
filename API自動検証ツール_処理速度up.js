@@ -264,8 +264,9 @@ function referenceAuthtest() {
       var referredKeyRowNumber = n + 1 //k=0のとき認証APIを指すが、前のifではじかれる
       var referredValueRowNumber = n + 2;//k=0のとき認証APIを指すが前のifではじかれる
 
-      lineArray[referredKeyRowNumber - 1] = [];
-      lineArray[referredValueRowNumber - 1] = [];
+        lineArray[referredKeyRowNumber - 1] = [];
+        lineArray[referredValueRowNumber - 1] = [];
+
 
       //console.log("最終行の範囲内です。")
       var referredAuths2Array = sht.getRange(1, 4, sht.getLastRow()).getValues();
@@ -283,7 +284,8 @@ function referenceAuthtest() {
       console.log(referredId);
       console.log("aaaaaaaaaaaaaaaaaaaaa");
       console.log(referId);
-      if (referredId.indexOf("認証") == -1 && referId.indexOf("認証") != -1) {
+      //if (referredId.indexOf("認証") == -1 && referId.indexOf("認証") != -1) {
+
         //認証APIにvalueがある場合のみ参照APIは参照する？
         //→認証APIにvalueがなくても参照するようにする。空valueでリクエスト投げて結果を返さないと上書きしたときエラーの原因がわからない。
         //if (referValueAccessToken != "" || referValueUserId != "") {
@@ -380,11 +382,11 @@ function referenceAuthtest() {
 
 
         //}//for colは独立しててよい
-      }
-      else {
-        console.log("対象API(No." + referId + ")は認証APIではないか、対象API(No." + referredId + ")は参照APIでないため、処理いたしません。")
-        continue;
-      }
+      //}
+      //else {
+        //console.log("対象API(No." + referId + ")は認証APIではないか、対象API(No." + referredId + ")は参照APIでないため、処理いたしません。")
+        //continue;
+      //}
     }
   }
 
@@ -395,7 +397,7 @@ function referenceAuthtest() {
   console.log(lineArray)
   console.log("認証を必要とする参照APIパラメーターのkeyのうち、user_idとaccess_tokenについて認証APIのvalueの値を書き込みます")
   console.log(referredValueRowNumber)
-  sht.getRange(startI + 1, startJ + 1, referredValueRowNumber, sht.getLastColumn()).setValues(lineArray);
+  sht.getRange(startI+1  , startJ+1 , referredValueRowNumber, sht.getLastColumn()).setValues(lineArray);
 }
 //認証APIのレスポンスを認証APIのvalueに書き出し
 function outputAuthPostToWritten(authId, authMethod, sht, authKeyRowNumber, authValueRowNumber) {
