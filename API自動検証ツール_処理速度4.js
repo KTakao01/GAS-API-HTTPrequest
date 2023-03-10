@@ -204,7 +204,7 @@ function referenceAuthtest9() {
   //全ての行の取得と、参照APIの各種カラム取得
   var lineArray = [];
 
-  for (var m = startH; m < numHI; m = m + 2) {
+  for (var m = startH; m < numHI-1; m = m + 2) {
     //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5→keyの行に対応
     //k=0のときk+2=2、k=2のときk+2=4,k=4のときk+2=6→valueの行に対応
     var referKeyRowNumber = m + 1 //k=0のとき認証APIを指す
@@ -259,7 +259,7 @@ function referenceAuthtest9() {
     //console.log(lineArray)
     //console.log(9999)
 
-    for (var n = 0; n < numJ; n += 2) {
+    for (var n = 0; n < numJ-1; n += 2) {
 
       var referredKeyRowNumber = n + 1 //k=0のとき認証APIを指すが、前のifではじかれる
       var referredValueRowNumber = n + 2;//k=0のとき認証APIを指すが前のifではじかれる
@@ -270,10 +270,10 @@ function referenceAuthtest9() {
       //console.log("最終行の範囲内です。")
       var referredAuths2Array = sht.getRange(1, 4, sht.getLastRow()).getValues();
       var referredAuth1Array = referredAuths2Array.flat();
-      var referredAuth = referredAuth1Array[referredKeyRowNumber-1];
+      var referredAuth = referredAuth1Array[referredKeyRowNumber];
       var referredIds2Array = sht.getRange(1, 1, sht.getLastRow()).getValues();
       var referredId1Array = referredIds2Array.flat();
-      var referredId = referredId1Array[referredKeyRowNumber-1];
+      var referredId = referredId1Array[referredKeyRowNumber];
       console.log(n)
       console.log(numJ-2)
       console.log(sht.getLastRow())
@@ -341,7 +341,7 @@ function referenceAuthtest9() {
             }
             else {
               console.log(referredKeyRowNumber + "行" + colLog + "列には値" + lineArray[referredKeyRowNumber - 1][col] + "をすでに保有しています")
-              console.log(lineArray[17])
+              
             }
 
 
