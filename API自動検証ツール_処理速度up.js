@@ -301,7 +301,11 @@ function referenceAuthtest() {
           var colLog = col + 1
           lineArray[referredKeyRowNumber - 1][col] = sht.getRange(referredKeyRowNumber, col + 1).getValue();
           lineArray[referredValueRowNumber - 1][col] = sht.getRange(referredValueRowNumber, col + 1).getValue();
+          console.log(referredAuth)
+          console.log(referId)
+             
 
+          console.log("mmmmmmmmmmmmmmmmmmmmmmm")
           if (referredAuth == referId) {
             //参照APIのパラメータkey取得
             //認証APIreferと参照APIreferredの切り分けを行い、認証APIのvalueを参照APIのvalueに書き込み
@@ -339,7 +343,7 @@ function referenceAuthtest() {
           }
           else {
             console.log("参照API(No." + referredId + ")が指定した認証API(No." + referredAuth + ")と一致しませんでした。処理いたしません。")
-            continue;
+            
           }
 
           if (lineArray[referredKeyRowNumber - 1][col] == "") {
@@ -362,8 +366,8 @@ function referenceAuthtest() {
             console.log(referredValueRowNumber + "行" + colLog + "列には値" + lineArray[referredValueRowNumber - 1][col] + "をすでに保有しています")
           }
           console.log(200000000000000000000)
-          console.log(lineArray[4])
-          console.log(lineArray[5])
+          console.log(lineArray)
+        
           //}
           //}
 
@@ -373,8 +377,8 @@ function referenceAuthtest() {
 
 
         console.log(100000000000000000000)
-        console.log(lineArray[4])
-        console.log(lineArray[5])
+        console.log(lineArray)
+        
 
 
 
@@ -391,8 +395,6 @@ function referenceAuthtest() {
   }
 
   //}
-  console.log(lineArray[5])
-  console.log(lineArray[6])
 
   console.log(lineArray)
   console.log("認証を必要とする参照APIパラメーターのkeyのうち、user_idとaccess_tokenについて認証APIのvalueの値を書き込みます")
