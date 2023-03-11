@@ -175,7 +175,7 @@ function mainNoPost(authId, authMethod, authAuth, sht, authKeyRowNumber, authVal
 }
 //認証APIのレスポンスを認証APIのvalueに書き出した結果を参照APIのvalueに書き出し
 //他のoutputxxx()と違いmainXXX()と依存関係にない点に注意。引数渡すと思っている挙動はできない。
-function referenceAuthtest10() {
+function referenceAuth() {
   //参照するAPIを選択する（改修予定）//"必要"部分を変数化する必要がある参照
   //認証APIをループで参照しつつ、参照APIを参照しながら書き換えていくので二重ループ
   var ss = SpreadsheetApp.getActiveSpreadsheet();
