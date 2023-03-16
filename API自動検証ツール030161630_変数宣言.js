@@ -16,7 +16,7 @@ function updateTrigger() {
   const ssId = ss.getId();
   const autoRun = ScriptApp.newTrigger("main").forSpreadsheet(ssId).onOpen().create();
 
-  Logger.log('スプレッドシート起動時に実行するトリガーを作成しました。.');
+  Logger.log('スプレッドシート起動時に実行するトリガーを作成しました。');
 }
 
 
@@ -70,7 +70,7 @@ function mainAuthPost() {
     //検証//Logger.log(method);//	[POST, POST, POST, GET]
     //検証//Logger.log(id);//[認証,1,2,3]
 
- 
+
     //認証と非認証APIの切り分け
     //認証APIはPOSTメソッドの想定
     if (authId.indexOf("認証") != -1 && authMethod == "POST") {
@@ -89,123 +89,117 @@ function mainAuthPost() {
 //POSTにより登録したデータをPUT、DELETE、GETできるので、POST処理の優先順位を上げている。
 //outputXXX()はsendXX()を呼び出す。sendXX()はリクエストを行い、outputXX()でリクエスト、レスポンスを書き出し
 //referenceXX()は認証APIを参照する関数。認証APIのaccess_tokenとuser_idを対象の参照APIに書き出してからリクエスト処理を行えるようにする
-function mainPost(authId, authMethod, authAuth, sht, authKeyRowNumber, authValueRowNumber) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sht = ss.getSheetByName('sample');
+function mainPost() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sht = ss.getSheetByName('sample');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
 
-  //複数セルの値を二次元配列として取得する - getValues -
-  var methodsArray = sht.getRange(1, 2, sht.getLastRow()).getValues();
-  var idsArray = sht.getRange(1, 1, sht.getLastRow()).getValues();
-  var authsArray = sht.getRange(1, 4, sht.getLastRow()).getValues();
+  //シートの値を二次元配列として取得する。
+  //APIのNo=ID、メソッド、認証APIの要不要について
+  const methodsArray = sht.getRange(1, 2, sht.getLastRow()).getValues();
+  const idsArray = sht.getRange(1, 1, sht.getLastRow()).getValues();
+  const authsArray = sht.getRange(1, 4, sht.getLastRow()).getValues();
   //Logger.log(methodsArray);//[[method],[POST],[method],[POST],[method], [POST],[method], [GET]]
   //Logger.log(idsArray);//[[No],[認証],[No], [1.0],[No], [2.0],[No], [3.0]] 
 
-
-  //取得した二次元配列：methodsArrayとidsArrayを１次配列に変換する
-  var methodArray = methodsArray.flat();
-  var idArray = idsArray.flat();
-  var authArray = authsArray.flat();
+  //取得した2次元配列を１次元配列に変換する
+  const methodArray = methodsArray.flat();
+  const idArray = idsArray.flat();
+  const authArray = authsArray.flat();
 
   // Logger.log(methodArray);
 
   //test　//id取得できているかの確認、後に行数に変換する.valueRowNumberとして定義する。
   //Logger.log(idArray);//[No,認証,No,1.0,No, 2.0,No, 3.0] //[0][2][4][6]・・・・がkeyでmainでは不要（sendXXで必要）//[1][3][5]・・・・がvalueで必要
 
-  for (var k = 0; k < idArray.length; k = k + 2) {
+  for (let k = 0; k < idArray.length; k = k + 2) {
     //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5→keyの行に対応
     //k=0のときk+2=2、k=2のときk+2=4,k=4のときk+2=6→valueの行に対応
-    var keyRowNumber = k + 1 //k=0のとき認証APIを指す
-    var valueRowNumber = k + 2;//k=0のとき認証APIを指す
+    const keyRowNumber = k + 1 //k=0のとき認証APIを指す
+    const valueRowNumber = k + 2;//k=0のとき認証APIを指す
     //admin/login,user/loginのように認証apiが2つ以上ある場合
     //検証//Logger.log(valueRowNumber+10);
 
     //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5
-    var id = idArray[keyRowNumber];
-    var method = methodArray[keyRowNumber];
-    var auth = authArray[keyRowNumber];
+    const id = idArray[keyRowNumber];
+    const method = methodArray[keyRowNumber];
+    const auth = authArray[keyRowNumber];
     //検証//Logger.log(method);//	[POST, POST, POST, GET]
     //検証//Logger.log(id);//[認証,1,2,3]
 
 
-    //認証と非認証の切り分け
-    //認証不要APIについて
+    //認証と参照の切り分け.参照APIのみリクエストして、リクエストとレスポンスを書き出し
     if (id.indexOf("認証") == -1 && method == "POST") {
 
-      //認証不要の場合、リクエスト処理
+      //認証API不要の場合、そのままリクエスト処理
       if (auth == "不要" || auth == "不明") {
         outputPostToWritten(id, method, sht, keyRowNumber, valueRowNumber);
       }
 
-      //認証必要APIについて
+      //認証API必要の場合、referenceAuth()にて認証APIのレスポンスを対象の参照APIのキーパラメータに上書きする
       else if (auth.indexOf("認証") != -1) {
         //referenceAuth()とmainPost()は依存関係にない
         referenceAuth();
         outputPostToWritten(id, method, sht, keyRowNumber, valueRowNumber);
-
       }
       else {
-
       }
     }
   }
 }
 
 
-//POSTしたデータをPUT、DELETE、GETするので、POST以外のメソッドの処理の優先順位を下げる。
-//PUT,DELETE,GETのリクエスト実行、書き込み処理
-function mainNoPost(authId, authMethod, authAuth, sht, authKeyRowNumber, authValueRowNumber) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sht = ss.getSheetByName('sample');
+//mainNoPost():シートの値を取得してGET,DELETE,PUTメソッドのリクエストと書き出しの準備。referenceAuth();とoutputNoPostToWritten()を呼び出す。
+//POSTしたデータをPUT、DELETE、GETするので、POST以外のメソッドの処理の優先順位を下げている。
+//outputXXX()はsendXX()を呼び出す。sendXX()はリクエストを行い、outputXX()でリクエスト、レスポンスを書き出し
+//referenceXX()は認証APIを参照する関数。認証APIのaccess_tokenとuser_idを対象の参照APIに書き出してからリクエスト処理を行えるようにする
+function mainNoPost() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sht = ss.getSheetByName('sample');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
 
-
-  //for (var i = 2; i < sht.getLastRow()+1 ;i = i +2) {}
-
-  //認証情報を参照して認証必要なAPIのuser_idとaccess_tokenの列に認証結果を書き出す。
-
-  //認証不要のときは、リクエスト処理を行う。
-
-  //複数セルの値を二次元配列として取得する - getValues -
-  var methodsArray = sht.getRange(1, 2, sht.getLastRow()).getValues();
-  var idsArray = sht.getRange(1, 1, sht.getLastRow()).getValues();
-  var authsArray = sht.getRange(1, 4, sht.getLastRow()).getValues();
+  //シートの値を二次元配列として取得する。
+  //APIのNo=ID、メソッド、認証APIの要不要について
+  const methodsArray = sht.getRange(1, 2, sht.getLastRow()).getValues();
+  const idsArray = sht.getRange(1, 1, sht.getLastRow()).getValues();
+  const authsArray = sht.getRange(1, 4, sht.getLastRow()).getValues();
   //Logger.log(methodsArray);//[[method],[POST],[method],[POST],[method], [POST],[method], [GET]]
   //Logger.log(idsArray);//[[No],[認証],[No], [1.0],[No], [2.0],[No], [3.0]] 
 
 
-  //取得した二次元配列：methodsArrayとidsArrayを１次配列に変換する
-  var methodArray = methodsArray.flat();
-  var idArray = idsArray.flat();
-  var authArray = authsArray.flat();
+  //取得した2次元配列を１次元配列に変換する
+  const methodArray = methodsArray.flat();
+  const idArray = idsArray.flat();
+  const authArray = authsArray.flat();
 
   // Logger.log(methodArray);
 
   //test　//id取得できているかの確認、後に行数に変換する.valueRowNumberとして定義する。
-  //Logger.log(idArray);//[No,認証,No,1.0,No, 2.0,No, 3.0] //[0][2][4][6]・・・・がkeyでmainでは不要（sendXXで必要）//[1][3][5]・・・・がvalueで必要
+  //Logger.log(idArray);
+  //[No,認証,No,1.0,No, 2.0,No, 3.0] //[0][2][4][6]・・・・がkeyでmainでは不要（sendXXで必要）//[1][3][5]・・・・がvalueで必要
 
-  for (var k = 0; k < idArray.length; k = k + 2) {
+  for (let k = 0; k < idArray.length; k = k + 2) {
 
     //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5→keyの行に対応
     //k=0のときk+2=2、k=2のときk+2=4,k=4のときk+2=6→valueの行に対応
-    var keyRowNumber = k + 1 //k=0のとき認証APIを指す
-    var valueRowNumber = k + 2;//k=0のとき認証APIを指す
+    const keyRowNumber = k + 1 //k=0のとき認証APIを指す
+    const valueRowNumber = k + 2;//k=0のとき認証APIを指す
     //admin/login,user/loginのように認証apiが2つ以上ある場合
     //検証//Logger.log(valueRowNumber+10);
 
 
     //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5
-    var id = idArray[keyRowNumber];
-    var method = methodArray[keyRowNumber];
-    var auth = authArray[keyRowNumber];
+    const id = idArray[keyRowNumber];
+    const method = methodArray[keyRowNumber];
+    const auth = authArray[keyRowNumber];
     //検証//Logger.log(method);//	[POST, POST, POST, GET]
     //検証//Logger.log(id);//[認証,1,2,3]
 
     //認証APIはPOSTのみの想定。GET,PUT,DELETEの認証APIが必要な場合は別途記述する必要あり。
-
-    //認証不要の非認証APIはリクエスト
-    //非認証APIについて
+    //認証と参照の切り分け.参照APIのみリクエストして、リクエストとレスポンスを書き出し
     if (id.indexOf("認証") == -1 && method != "POST") {
+
+      //認証API不要の場合、そのままリクエスト処理
       if (auth == "不要" || auth == "不明") {
         outputNoPostToWritten(id, method, sht, keyRowNumber, valueRowNumber);
       }
@@ -214,19 +208,15 @@ function mainNoPost(authId, authMethod, authAuth, sht, authKeyRowNumber, authVal
 
       }
 
-      //認証必要APIについて
-      if (auth.lastIndexOf("認証") != -1) {
+      //認証API必要の場合、referenceAuth()にて認証APIのレスポンスを対象の参照APIのキーパラメータに上書きする
+      if (auth.indexOf("認証") != -1) {
         //referenceAuth()とmainNoPost()は依存関係にない
         referenceAuth();
         outputNoPostToWritten(id, method, sht, keyRowNumber, valueRowNumber);
-
-
-
       }
       else {
 
       }
-
 
     }
     else {
@@ -325,9 +315,9 @@ function referenceAuth() {
       var referValueUserId = arraySheet[referValueRowNumber - 1][11];
       //sht.getRange(referValueRowNumber, 12).getValue();
 
-      var referKeyAccessTokenPre = arraySheet[referKeyRowNumber-1][10]
+      var referKeyAccessTokenPre = arraySheet[referKeyRowNumber - 1][10]
       //sht.getRange(referKeyRowNumber, 11).getValue();
-      var referKeyUserIdPre = arraySheet[referKeyRowNumber-1][11]
+      var referKeyUserIdPre = arraySheet[referKeyRowNumber - 1][11]
       //sht.getRange(referKeyRowNumber, 12).getValue();
 
       var referKeyAccessToken = referKeyAccessTokenPre.substring(referKeyAccessTokenPre.indexOf("access_token"), referKeyAccessTokenPre.length);
@@ -392,7 +382,7 @@ function referenceAuth() {
               sht.getRange(referredValueRowNumber, 11 + count).setValue(referValueUserId);
             }
             else if (referValueAccessToken != "" && referredKey1array[count] == referKeyAccessToken) {
-              console.log("access_tokenのkeyです。書き込み処理を行います。");   
+              console.log("access_tokenのkeyです。書き込み処理を行います。");
               sht.getRange(referredValueRowNumber, 11 + count).setValue(referValueAccessToken);
             }
             else {
