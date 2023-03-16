@@ -27,7 +27,7 @@ function main() {
 //リクエスト処理の実行、書き込む処理はmainAuthPost()で行う。sendXX()はリクエストとログ書き出し。
 function mainAuthPost() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sht = ss.getSheetByName('testのコピー');
+  var sht = ss.getSheetByName('sample');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
   //複数セルの値を二次元配列として取得する - getValues -
   var methodsArray = sht.getRange(1, 2, sht.getLastRow()).getValues();
@@ -69,7 +69,7 @@ function mainAuthPost() {
 //リクエスト処理の実行、書き込む処理はmainPost()で行う。sendXX()はリクエストとログ書き出し。
 function mainPost(authId, authMethod, authAuth, sht, authKeyRowNumber, authValueRowNumber) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sht = ss.getSheetByName('testのコピー');
+  var sht = ss.getSheetByName('sample');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
   //複数セルの値を二次元配列として取得する - getValues -
   var methodsArray = sht.getRange(1, 2, sht.getLastRow()).getValues();
@@ -120,7 +120,7 @@ function mainPost(authId, authMethod, authAuth, sht, authKeyRowNumber, authValue
 //PUT,DELETE,GETのリクエスト実行、書き込み処理
 function mainNoPost(authId, authMethod, authAuth, sht, authKeyRowNumber, authValueRowNumber) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sht = ss.getSheetByName('testのコピー');
+  var sht = ss.getSheetByName('sample');
   //test//Logger.log(sht.getLastRow()+100);　//100+4//行を取得できているかの確認
   //for (var i = 2; i < sht.getLastRow()+1 ;i = i +2) {}
   //認証情報を参照して認証必要なAPIのuser_idとaccess_tokenの列に認証結果を書き出す。
@@ -175,11 +175,11 @@ function mainNoPost(authId, authMethod, authAuth, sht, authKeyRowNumber, authVal
 }
 //認証APIのレスポンスを認証APIのvalueに書き出した結果を参照APIのvalueに書き出し
 //他のoutputxxx()と違いmainXXX()と依存関係にない点に注意。引数渡すと思っている挙動はできない。
-function referenceAuthtest3() {
+function referenceAuth2() {
   //参照するAPIを選択する（改修予定）//"必要"部分を変数化する必要がある参照
   //認証APIをループで参照しつつ、参照APIを参照しながら書き換えていくので二重ループ
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sht = ss.getSheetByName('testのコピー');
+  var sht = ss.getSheetByName('sample');
   //複数セルの値を二次元配列として取得する - getValues -
   var referMethodsArray = sht.getRange(1, 2, sht.getLastRow()).getValues();
   var referIdsArray = sht.getRange(1, 1, sht.getLastRow()).getValues();
@@ -196,187 +196,232 @@ function referenceAuthtest3() {
   var startH = 0
 
   // const startJ = 0
-  var numHI = referIdArray.length
+  //var numHI = referIdArray.length
+  var numHI = sht.getLastRow()
   //const numJ = referredKey1array.length
   //認証APIを参照する
-  for (var m = startH; m < numHI; m = m + 2) {
-    //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5→keyの行に対応
-    //k=0のときk+2=2、k=2のときk+2=4,k=4のときk+2=6→valueの行に対応
-    var referKeyRowNumber = m + 1 //k=0のとき認証APIを指す
-    var referValueRowNumber = m + 2;//k=0のとき認証APIを指
-    //admin/login,user/loginのように認証apiが2つ以上ある場合
-    //検証//Logger.log(valueRowNumber+10);
-    //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5
-    var referId = referIdArray[referKeyRowNumber];
-    var referMethod = referMethodArray[referKeyRowNumber];
-    var referAuth = referAuthArray[referKeyRowNumber];
-    //検証//Logger.log(referMethod);//  [POST, POST, POST, GET]
-    //検証//Logger.log(referId);//[認証,1,2,3]
-    //検証//console.log(referMethod);
-    //検証//console.log(referAuth);
-    //検証//console.log(referId);
-    console.log("認証API(No." + referId + ")に対応する参照APIの有無を調べます。")
-    //認証APIのkey-valueを抽出。keyはあとで条件一致の時に使う。”返却された”という文字以外を抽出した
-    if (referId.indexOf("認証") != -1) {
-      console.log("認証API(No." + referId + ")のaccess_tokenおよびuser_idを参照API に渡すために取得します。\n取得結果は以下の通りです。")
-      var referValueAccessToken = sht.getRange(referValueRowNumber, 11).getValue();
-      var referValueUserId = sht.getRange(referValueRowNumber, 12).getValue();
-      var referKeyAccessTokenPre = sht.getRange(referKeyRowNumber, 11).getValue();
-      var referKeyUserIdPre = sht.getRange(referKeyRowNumber, 12).getValue();
-      var referKeyAccessToken = referKeyAccessTokenPre.substring(referKeyAccessTokenPre.indexOf("access_token"), referKeyAccessTokenPre.length);
-      var referKeyUserId = referKeyUserIdPre.substring(referKeyUserIdPre.indexOf("user_id"), referKeyUserIdPre.length);
-      console.log(referValueUserId);
-      console.log(referValueAccessToken);
-      console.log(referKeyUserId);
-      console.log(referKeyAccessToken);
-    }
-    else {
-      console.log("参照API(NO." + referId + ")のaccess_tokenおよびuser_idは参照APIに渡すためには取得しません。")
-    }
-    //参照APIを参照。keyを取得
-    //認証APIでvalueに値がある時に、参照APIが選択した認証APIのvalueを参照APIのkey-valueに書き込むための前処理
-    var startI = 0
-    dataToken = []
-    dataId = []
-    //console.log(numHI)//18
-    //console.log(dataId)//[]
-    ////for (var n = startI; n < numHI; n = n + 2) {
-    //全ての行の取得と、参照APIの各種カラム取得
-    var lineArray = [];
-    for (var line = startI; line < numHI; line++) {
 
-      var startJ = 0
-      //全ての列を取得→ジャグ配列を取得//独立していていい
-      var numJ = sht.getLastColumn();
-      //console.log(numJ);//26の想定→OK//ジャグ配列の最長要素を返してくれる。
-      //console.log(777)
-      //シートを1行ずつ取得
+  //全ての行の取得と、参照APIの各種カラム取得
+  var lineArray = [];
 
-      lineArray[line] = [];
-      console.log(lineArray)
-      console.log(9999)
-      //取得した行の配列に空白があれば、nullを入れる
-      for (col = startJ; col < numJ; col++) {
-        lineArray[line][col] = sht.getRange(line + 1, col + 1).getValue();
-        if (lineArray[line][col] == "") {
-          lineArray[line][col] = null
-          console.log("ジャグ配列の最大数に揃うように、空白セルにnullを代入しています。")
+
+  //参照APIを参照。keyを取得
+  //認証APIでvalueに値がある時に、参照APIが選択した認証APIのvalueを参照APIのkey-valueに書き込むための前処理
+  var startI = 0
+  //console.log(numHI)//18
+  //console.log(dataId)//[]
+  ////for (var n = startI; n < numHI; n = n + 2) {
+
+  //for (var line = startI; line < numHI; line++) {
+
+  var startJ = 0
+  //全ての列を取得→ジャグ配列を取得//独立していていい
+  var numJ = sht.getLastRow();
+  //console.log(numJ);//26の想定→OK//ジャグ配列の最長要素を返してくれる。
+  //console.log(777)
+  //シートを1行ずつ取得
+
+  //console.log(lineArray)
+  //console.log(9999)
+
+  //参照APIの配列取得
+  //var referredAuths2Array = sht.getRange(1, 4, sht.getLastRow()).getValues();
+  //var referredAuth1Array = referredAuths2Array.flat();
+  //var referredIds2Array = sht.getRange(1, 1, sht.getLastRow()).getValues();
+  //var referredId1Array = referredIds2Array.flat();
+
+
+  //シートの値を参照用に取得
+  var maxRow = sht.getLastRow()
+  var maxCol = sht.getLastColumn()
+  // シート全範囲の値
+  var arraySheet = sht.getRange(1, 1, maxRow, maxCol).getValues()
+
+  var referredAuth1Array = arraySheet.map(item => item[3]);
+  //var referredAuth1Array = referredAuths2Array.flat();
+  var referredId1Array = arraySheet.map(item => item[0]);
+  //var referredId1Array = referredIds2Array.flat();
+  console.log(referredAuth1Array)
+  console.log(typeof referredAuth1Array)
+
+  for (var n = 0; n < numJ - 1; n += 2) {
+
+    var referredKeyRowNumber = n + 1 //k=0のとき認証APIを指すが、前のifではじかれる
+    var referredValueRowNumber = n + 2;//k=0のとき認証APIを指すが前のifではじかれる
+
+    lineArray[referredKeyRowNumber - 1] = [];
+    lineArray[referredValueRowNumber - 1] = [];
+
+
+    //console.log("最終行の範囲内です。")
+    //console.log(referredAuth1Array)
+    var referredAuth = referredAuth1Array[referredKeyRowNumber];
+    //referredAuth1Array.map(item => item[referredKeyRowNumber-1]);
+
+    var referredId = referredId1Array[referredKeyRowNumber];
+    //referredId1Array.map(item => item[referredKeyRowNumber-1]);
+
+    //if (referredId.indexOf("認証") == -1 && referId.indexOf("認証") != -1) {
+
+    //認証APIにvalueがある場合のみ参照APIは参照する？
+    //→認証APIにvalueがなくても参照するようにする。空valueでリクエスト投げて結果を返さないと上書きしたときエラーの原因がわからない。
+    //if (referValueAccessToken != "" || referValueUserId != "") {
+    console.log(n + "ループについて" + "認証API(No." + referId + ")を参照するAPI(No." + referredId + ")のパラメータを取得しています。");
+    //指定した認証APIを参照する
+
+
+    console.log("参照しているAPI(No." + referredId + ")が指定した認証API(No." + referId + ")と一致しました。\n参照API(No." + referredId + ")パラメーターのkeyは以下の通りです。")
+
+    //全ての列を取得する
+    //取得した行の配列に空白があれば、nullを入れる
+    for (col = startJ; col < sht.getLastColumn(); col++) {
+      console.log(col + "ループについて配列の要素数について処理を行います。")
+      var colLog = col + 1
+      lineArray[referredKeyRowNumber - 1][col] = arraySheet[referredKeyRowNumber - 1][col]
+      //sht.getRange(referredKeyRowNumber, col + 1).getValue();
+      lineArray[referredValueRowNumber - 1][col] = arraySheet[referredValueRowNumber - 1][col]
+      //sht.getRange(referredValueRowNumber, col + 1).getValue();
+      console.log(referredAuth)
+      console.log(referId)
+
+      for (var m = startH; m < numHI - 1; m = m + 2) {
+        //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5→keyの行に対応
+        //k=0のときk+2=2、k=2のときk+2=4,k=4のときk+2=6→valueの行に対応
+        var referKeyRowNumber = m + 1 //k=0のとき認証APIを指す
+        var referValueRowNumber = m + 2;//k=0のとき認証APIを指
+        //admin/login,user/loginのように認証apiが2つ以上ある場合
+        //検証//Logger.log(valueRowNumber+10);
+        //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5
+        var referId = referIdArray[referKeyRowNumber];
+        var referMethod = referMethodArray[referKeyRowNumber];
+        var referAuth = referAuthArray[referKeyRowNumber];
+        //検証//Logger.log(referMethod);//  [POST, POST, POST, GET]
+        //検証//Logger.log(referId);//[認証,1,2,3]
+        //検証//console.log(referMethod);
+        //検証//console.log(referAuth);
+        //検証//console.log(referId);
+        console.log(m + "ループについて" + "認証API(No." + referId + ")に対応する参照APIの有無を調べます。")
+        //認証APIのkey-valueを抽出。keyはあとで条件一致の時に使う。”返却された”という文字以外を抽出した
+        if (referId.indexOf("認証") != -1) {
+          console.log("認証API(No." + referId + ")のaccess_tokenおよびuser_idを参照API に渡すために取得します。\n取得結果は以下の通りです。")
+          var referValueAccessToken = arraySheet[referValueRowNumber - 1][10]
+          //sht.getRange(referValueRowNumber, 11).getValue();
+          var referValueUserId = arraySheet[referValueRowNumber - 1][11]
+          //sht.getRange(referValueRowNumber, 12).getValue();
+          var referKeyAccessTokenPre = arraySheet[referKeyRowNumber - 1][10]
+          //sht.getRange(referKeyRowNumber, 11).getValue();
+          var referKeyUserIdPre = arraySheet[referKeyRowNumber - 1][11]
+          //sht.getRange(referKeyRowNumber, 12).getValue();
+          var referKeyAccessToken = referKeyAccessTokenPre.substring(referKeyAccessTokenPre.indexOf("access_token"), referKeyAccessTokenPre.length);
+          var referKeyUserId = referKeyUserIdPre.substring(referKeyUserIdPre.indexOf("user_id"), referKeyUserIdPre.length);
+          //console.log(referValueUserId);
+          //console.log(referValueAccessToken);
+          //console.log(referKeyUserId);
+          //console.log(referKeyAccessToken);
+
         }
         else {
-          console.log("既存の値を取得しています。")
+          console.log("参照API(NO." + referId + ")のaccess_tokenおよびuser_idは参照APIに渡すためには取得しません。")
+          continue;
+        }
+        if (referredAuth == referId) {
+          //参照APIのパラメータkey取得
+          //認証APIreferと参照APIreferredの切り分けを行い、認証APIのvalueを参照APIのvalueに書き込み
+
+
+
+
+
+          //認証APIのuser_idバリューが存在していて、参照APIのキー配列に認証APIのuser_idキーが一致するところで、認証APIのuser_idバリューを渡す
+          if (referValueUserId != "" && lineArray[referredKeyRowNumber - 1][col] == referKeyUserId) {
+            console.log(colLog + "列は" + lineArray[referredKeyRowNumber - 1][col] + "のkeyです。\n" + referredKeyRowNumber + "行" + colLog + "列のセルがuser_idキーですので" + referKeyUserId + "の書き込み処理を行う予定です。")
+            lineArray[referredValueRowNumber - 1][col] = referValueUserId
+            console.log(lineArray[referredValueRowNumber - 1][col]);
+            console.log(referredValueRowNumber - 1)
+            console.log(400000000000000000000)
+            console.log(lineArray)
+
+
+          }
+          //認証APIのaccess_tokenバリューが存在していて、参照APIのキー配列に認証APIのaccess_tokenキーが一致するところで、認証APIのaccess_tokenバリューを渡す
+          else if (referValueAccessToken != "" && lineArray[referredKeyRowNumber - 1][col] == referKeyAccessToken) {
+            console.log(colLog + "列は" + lineArray[referredKeyRowNumber - 1][col] + "のkeyです。\n" + referredKeyRowNumber + "行" + colLog + "列のセルがaccess_tokenキーですので" + referKeyAccessToken + "の書き込み処理を行う予定です。");
+            lineArray[referredValueRowNumber - 1][col] = referValueAccessToken
+            console.log(lineArray[referredValueRowNumber - 1][col])
+            console.log(referredValueRowNumber - 1)
+
+          }
+          //認証APIのuser_idバリュー,access_tokenバリューが存在しない、または、参照APIのキー配列に認証APIのuser_id,access_tokenキーが一致しない。
+          else {
+            console.log("user_idおよびaccess_tokenのkeyではありません。該当の配列要素を書き換えません。\n書き込み処理は行いません。")
+            console.log(colLog + "列は" + lineArray[referredKeyRowNumber - 1][col] + "のkeyです。\n" + referredKeyRowNumber + "行" + colLog + "列のセルがaccess_tokenでもuser_idキーでもありませんので書き込み処理を行いません")
+            //console.log(referValueRowNumber - 1)
+          }
+
+        }
+        else {
+          console.log("参照API(No." + referredId + ")が指定した認証API(No." + referredAuth + ")と一致しませんでした。空白セルを検出します。")
+
+          if (lineArray[referredKeyRowNumber - 1][col] == "") {
+            console.log(referredKeyRowNumber - 1)
+            console.log("ジャグ配列の最大数に揃うように、keyについて空白セル" + referredKeyRowNumber + "行" + colLog + "列にnullを代入しています。")
+            lineArray[referredKeyRowNumber - 1][col] = null
+          }
+          else {
+            console.log(referredKeyRowNumber + "行" + colLog + "列には値" + lineArray[referredKeyRowNumber - 1][col] + "をすでに保有しています")
+
+          }
+
+
+          if (lineArray[referredValueRowNumber - 1][col] == "") {
+            lineArray[referredValueRowNumber - 1][col] = null
+            console.log(referredValueRowNumber - 1)
+            console.log("ジャグ配列の最大数に揃うように、valueについて空白セル" + referredValueRowNumber + "行" + colLog + "列にnullを代入しています。")
+          }
+          else {
+            console.log(referredValueRowNumber + "行" + colLog + "列には値" + lineArray[referredValueRowNumber - 1][col] + "をすでに保有しています")
+          }
+          console.log(200000000000000000000)
+          console.log(lineArray)
+
+
+
+
+
         }
 
+
         //}
-        console.log(lineArray)
-        console.log(10000)
-
-        //for (var n = 0; n < referIdArray.length; n += 2) {
-          var n = 2 * line;
-          var referredKeyRowNumber = n + 1; //k=0のとき認証APIを指すが、前のifではじかれる
-          var referredValueRowNumber = n + 2;//k=0のとき認証APIを指すが前のifではじかれる
-
-
-          console.log("最終行の範囲内です。")
-          var referredAuths2Array = sht.getRange(1, 4, sht.getLastRow()).getValues();
-          var referredAuth1Array = referredAuths2Array.flat();
-          var referredAuth = referredAuth1Array[referredKeyRowNumber];
-          var referredIds2Array = sht.getRange(1, 1, sht.getLastRow()).getValues();
-          var referredId1Array = referredIds2Array.flat();
-          var referredId = referredId1Array[referredKeyRowNumber];
-
-
-
-          //認証APIreferと参照APIreferredの切り分けを行い、認証APIのvalueを参照APIのvalueに書き込み
-          if (referredId.indexOf("認証") == -1 && referId.indexOf("認証") != -1) {
-            //認証APIにvalueがある場合のみ参照APIは参照する？
-            //→認証APIにvalueがなくても参照するようにする。空valueでリクエスト投げて結果を返さないと上書きしたときエラーの原因がわからない。
-            //if (referValueAccessToken != "" || referValueUserId != "") {
-            console.log("認証API(No." + referId + ")を参照するAPI(No." + referredId + ")のパラメータを取得しています。");
-            //指定した認証APIを参照する
-            if (referredAuth == referId) {
-              //参照APIのパラメータkey取得
-              var rangeParam = sht.getRange(referredKeyRowNumber, 11, 1, sht.getLastColumn() - 10)
-              const referredKeys2array = rangeParam.getValues()
-              //console.log(referredKeys2array)
-              var referredKey1array = referredKeys2array.flat()
-              //console.log(referredKeyRowNumber);
-              console.log("参照しているAPI(No." + referId + ")が指定した認証API(No." + referredId + ")と一致しました。\n参照API(No." + referId + ")パラメーターのkeyは以下の通りです。")
-
-              //指定した認証APIと一致した参照APIのキーパラメータを配列取得
-              console.log(referredKey1array);
-
-
-              //console.log(numJ*10)//180
-              //dataToken[referredValueRowNumber] = [];
-              //dataId[referredValueRowNumber] = [];
-              //dataToken[npre] = [];
-              //dataId[npre] = [];
-
-              //console.log(referredValueRowNumber-1 + 100000);
-
-              //取得した認証APIパラムのkey要素を順次みていって、user_idとaccess_tokenの列を取り出し、認証APIの該当valueを書き込み
-              //for (count = startJ; count < referredKey1array.length; count++) {
-                //console.log(dataToken)
-                //console.log(dataId)//18
-                console.log("参照APIパラメーターのkeyのうち" + referredKey1array[count] + "について、以下の通り上書き処理の準備を行います。")
-
-                //全ての列を取得する
-
-                //認証APIのuser_idバリューが存在していて、参照APIのキー配列に認証APIのuser_idキーが一致するところで、認証APIのuser_idバリューを渡す
-                if (referValueUserId != "" && referredKey1array[count] == referKeyUserId) {
-                  console.log("user_idのkeyです。該当の配列要素を書き換えます。\n書き込み処理を行う予定です。");
-                  lineArray[referredValueRowNumber - 1][10 + count] = referValueUserId
-                  console.log(referValueRowNumber - 1)
-                  console.log(10 + count)
-                  console.log(lineArray)
-                }
-                //認証APIのaccess_tokenバリューが存在していて、参照APIのキー配列に認証APIのaccess_tokenキーが一致するところで、認証APIのaccess_tokenバリューを渡す
-                else if (referValueAccessToken != "" && referredKey1array[count] == referKeyAccessToken) {
-                  console.log("access_tokenのkeyです。該当の配列要素を書き換えます。\n書き込み処理を行う予定です。");
-                  lineArray[referredValueRowNumber - 1][10 + count] = referValueAccessToken
-                  console.log(referValueRowNumber - 1)
-                  console.log(10 + count)
-                  console.log(lineArray)
-                }
-                //認証APIのuser_idバリュー,access_tokenバリューが存在しない、または、参照APIのキー配列に認証APIのuser_id,access_tokenキーが一致しない。
-                else {
-                  console.log("user_idおよびaccess_tokenのkeyではありません。該当の配列要素を書き換えません。\n書き込み処理は行いません。")
-                  //dataToken[referredValueRowNumber - 1][10 + count] = null
-                  //console.log(referValueRowNumber - 1)
-                  //console.log(10 + count)
-                  //console.log(dataToken)
-                  //dataId[referredValueRowNumber - 1][10 + count] = referValueUserId
-                  //console.log(dataId)
-
-                }
-              //}
-
-            }
-
-            else {
-              console.log("参照API(No." + referredId + ")が指定した認証API(No." + referredAuth + ")と一致しませんでした。処理いたしません。")
-            }
-          }
-
-          else {
-            console.log("対象API(No." + referId + ")は認証APIではないか、対象API(No." + referredId + ")は参照APIでないため、処理いたしません。")
-          }
-
-          //}//for colは独立しててよい
         //}
-      }
-    }
 
-  }
+      }//m
+    }//col
 
+
+
+    console.log(100000000000000000000)
+    console.log(lineArray)
+
+
+
+
+    //console.log(10000)
+
+
+    //}
+    //else {
+    //console.log("対象API(No." + referId + ")は認証APIではないか、対象API(No." + referredId + ")は参照APIでないため、処理いたしません。")
+    //continue;
+    //}
+  }//n
+
+
+  //}
+
+  console.log(lineArray[19])
   console.log("認証を必要とする参照APIパラメーターのkeyのうち、user_idとaccess_tokenについて認証APIのvalueの値を書き込みます")
-  //console.log("user_idのの書き込み処理を行います。");
-  //console.log("access_tokenの書き込み処理を行います。");
-  sht.getRange(startI + 1, startJ + 1, numHI, numJ).setValues(lineArray);
-  //sht.getRange(referredValueRowNumber, 11 + count).setValue(referValueAccessToken);
-
-
-
+  console.log(referredValueRowNumber)
+  sht.getRange(startI + 1, startJ + 1, referredValueRowNumber, sht.getLastColumn()).setValues(lineArray);
 }
 //認証APIのレスポンスを認証APIのvalueに書き出し
 function outputAuthPostToWritten(authId, authMethod, sht, authKeyRowNumber, authValueRowNumber) {
@@ -566,7 +611,6 @@ function sendAuthPostRequest(sht, authKeyRowNumber, authValueRowNumber, authMeth
     else if (authAccessToken == "undefined") {
       var authAccessToken = String(obj.access_token);
     }
-
 
 
     var error = null
@@ -862,4 +906,6 @@ function sendDeleteRequest(sht, keyRowNumber, valueRowNumber, method) {
     return [deleteString, deleteMessage, deleteStatusCode, error];
   }
 }
-//テスト//Logger.log(idArray);
+    //テスト//Logger.log(idArray);
+
+
