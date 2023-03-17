@@ -241,38 +241,28 @@ function referenceAuth() {
   // シート全範囲の値
   const arraySheet = sht.getRange(1, 1, maxRow, maxCol).getValues()
 
-  var referAuthArray = arraySheet.map(item => item[3]);
-  var referIdArray = arraySheet.map(item => item[0]);
-  var referMethodArray = arraySheet.map(item => item[1]);
+  const referAuthArray = arraySheet.map(item => item[3]);
+  const referIdArray = arraySheet.map(item => item[0]);
+  const referMethodArray = arraySheet.map(item => item[1]);
   //Logger.log(referMethodsArray);//[[method],[POST],[method],[POST],[method], [POST],[method], [GET]]
   //Logger.log(referIdsArray);//[[No],[認証],[No], [1.0],[No], [2.0],[No], [3.0]] 
 
-  var referredAuth1Array = arraySheet.map(item => item[3]);
-  //var referredAuth1Array = referredAuths2Array.flat();
-  var referredId1Array = arraySheet.map(item => item[0]);
-  //var referredId1Array = referredIds2Array.flat();
+  const referredAuth1Array = arraySheet.map(item => item[3]);
+  const referredId1Array = arraySheet.map(item => item[0]);
 
-
-  //var referredAuths2Array = sht.getRange(1, 4, sht.getLastRow()).getValues();
-  //var referredAuth1Array = referredAuths2Array.flat();
-  //var referredIds2Array = sht.getRange(1, 1, sht.getLastRow()).getValues();
-  //var referredId1Array = referredIds2Array.flat();
-
-
-  //認証APIを参照する
-  for (var m = 0; m < referIdArray.length; m = m + 2) {
+  //認証APIの行に関する情報を取得する
+  for (let m = 0; m < referIdArray.length; m = m + 2) {
 
     //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5→keyの行に対応
     //k=0のときk+2=2、k=2のときk+2=4,k=4のときk+2=6→valueの行に対応
-    var referKeyRowNumber = m + 1 //k=0のとき認証APIを指す
-    var referValueRowNumber = m + 2;//k=0のとき認証APIを指
-    //admin/login,user/loginのように認証apiが2つ以上ある場合
+    const referKeyRowNumber = m + 1 //k=0のとき認証APIを指す
+    const referValueRowNumber = m + 2;//k=0のとき認証APIを指
     //検証//Logger.log(valueRowNumber+10);
 
     //k=0のときk+1=1、k=2のときk+1=3,k=4のときk+1=5
-    var referId = referIdArray[referKeyRowNumber];
-    var referMethod = referMethodArray[referKeyRowNumber];
-    var referAuth = referAuthArray[referKeyRowNumber];
+    const referId = referIdArray[referKeyRowNumber];
+    const referMethod = referMethodArray[referKeyRowNumber];
+    const referAuth = referAuthArray[referKeyRowNumber];
     //検証//Logger.log(referMethod);//	[POST, POST, POST, GET]
     //検証//Logger.log(referId);//[認証,1,2,3]
 
@@ -286,71 +276,56 @@ function referenceAuth() {
     if (referId.indexOf("認証") != -1) {
       console.log("認証API(No." + referId + ")のaccess_tokenおよびuser_idを参照APIに渡すために取得します。\n取得結果は以下の通りです。")
       var referValueAccessToken = arraySheet[referValueRowNumber - 1][10];
-      //sht.getRange(referValueRowNumber, 11).getValue();
       var referValueUserId = arraySheet[referValueRowNumber - 1][11];
-      //sht.getRange(referValueRowNumber, 12).getValue();
 
       var referKeyAccessTokenPre = arraySheet[referKeyRowNumber - 1][10]
-      //sht.getRange(referKeyRowNumber, 11).getValue();
       var referKeyUserIdPre = arraySheet[referKeyRowNumber - 1][11]
-      //sht.getRange(referKeyRowNumber, 12).getValue();
 
       var referKeyAccessToken = referKeyAccessTokenPre.substring(referKeyAccessTokenPre.indexOf("access_token"), referKeyAccessTokenPre.length);
       var referKeyUserId = referKeyUserIdPre.substring(referKeyUserIdPre.indexOf("user_id"), referKeyUserIdPre.length);
-      console.log(referValueUserId);
-      console.log(referValueUserId);
-      console.log(referValueAccessToken);
-      console.log(referKeyUserId);
-      console.log(referKeyAccessToken);
+      //console.log(referValueUserId);
+      //console.log(referValueUserId);
+      //console.log(referValueAccessToken);
+      //console.log(referKeyUserId);
+      //console.log(referKeyAccessToken);
     }
 
     else {
       console.log("参照API(NO." + referId + ")のaccess_tokenおよびuser_idは参照APIに渡すためには取得しません。")
     }
 
-    //参照APIを参照。keyを取得
+    //参照APIの行に関する情報を取得
     //認証APIでvalueに値がある時に、参照APIが選択した認証APIのvalueを参照APIのkey-valueに書き込むための前処理
-    for (var n = 0; n < referIdArray.length; n = n + 2) {
+    for (let n = 0; n < referIdArray.length; n = n + 2) {
+      const referredKeyRowNumber = n + 1 //k=0のとき認証APIを指すが、前のifではじかれる
+      const referredValueRowNumber = n + 2;//k=0のとき認証APIを指すが前のifではじかれる
 
-
-      var referredKeyRowNumber = n + 1 //k=0のとき認証APIを指すが、前のifではじかれる
-      var referredValueRowNumber = n + 2;//k=0のとき認証APIを指すが前のifではじかれる
-
-      var referredAuth = referredAuth1Array[referredKeyRowNumber];
-
-      var referredId = referredId1Array[referredKeyRowNumber];
+      const referredAuth = referredAuth1Array[referredKeyRowNumber];
+      const referredId = referredId1Array[referredKeyRowNumber];
 
       //認証APIreferと参照APIreferredの切り分けを行い、認証APIのvalueを参照APIのvalueに書き込み
       if (referredId.indexOf("認証") == -1 && referId.indexOf("認証") != -1) {
-        //認証APIにvalueがある場合のみ参照APIは参照する？
-        //→認証APIにvalueがなくても参照するようにする。空valueでリクエスト投げて結果を返さないと上書きしたときエラーの原因がわからない。
-        //if (referValueAccessToken != "" || referValueUserId != "") {
-
+        //認証APIにvalueがなくても参照する。空valueでリクエスト投げて結果を返さないと上書きしたときエラーの原因がわからない。
         console.log("認証API(No." + referId + ")を参照するAPI(No." + referredId + ")のパラメータを取得しています。");
 
-        //指定した認証APIを参照する
+        //指定した認証APIを参照する(No.カラムと認証APIカラムが一致するときに参照APIに認証APIのレスポンスを書き込む
         if (referredAuth == referId) {
-
           //参照APIのパラメータkey取得
-          //var rangeParam = sht.getRange(referredKeyRowNumber, 11, 1, sht.getLastColumn() - 10)
-          var referredKey1array = arraySheet.slice(referredKeyRowNumber - 1, referredKeyRowNumber).map(row => row.slice(10, maxCol)).flat()
-          console.log(referredKey1array)
-          console.log("aaasdkaf;aslj")
-          //const referredKeys2array = rangeParam.getValues()
-          //var referredKey1array = referredKeys2array.flat()
+          const referredKey1array = arraySheet.slice(referredKeyRowNumber - 1, referredKeyRowNumber).map(row => row.slice(10, maxCol)).flat()
+          //console.log(referredKey1array)
+          //console.log("aaasdkaf;aslj")
           //console.log(referredKeyRowNumber);
           console.log("参照しているAPI(No." + referId + ")が指定した認証API(No." + referredId + ")と一致しました。\n参照API(No." + referId + ")パラメーターのkeyは以下の通りです。")
           console.log(referredKey1array);
 
-
           //取得した認証APIパラムのkey要素を順次みていって、user_idとaccess_tokenの列を取り出し、認証APIの該当valueを書き込み
-          for (count = 0; count < referredKey1array.length; count++) {
+          for (let count = 0; count < referredKey1array.length; count++) {
             console.log("参照APIパラメーターのkeyのうち" + referredKey1array[count] + "について、以下の通り処理を行います。")
-            console.log(count)
-            console.log(referredKey1array[count])
-            console.log(referKeyUserId)
-            console.log(referKeyAccessToken)
-            console.log("aaaklmsladmflk")
+            //console.log(count)
+            //console.log(referredKey1array[count])
+            //console.log(referKeyUserId)
+            //console.log(referKeyAccessToken)
+            //console.log("aaaklmsladmflk")
 
             if (referValueUserId != "" && referredKey1array[count] == referKeyUserId) {
               console.log("user_idのkeyです。書き込み処理を行います。");
@@ -380,33 +355,33 @@ function referenceAuth() {
 
 
 
-//認証APIのレスポンスを認証APIのvalueに書き出し
+//認証APIのリクエスト、レスポンスを認証APIのvalueに書き出し
 function outputAuthPostToWritten(authId, authMethod, sht, authKeyRowNumber, authValueRowNumber) {
-
 
   if (authMethod == "POST" && authId.indexOf("認証") != -1) {
     //console.log("呼び出し確認開始");
-
     //認証APIのレスポンスを認証APIのvalueに書き出し
     const [authPostString, authPostMessage, authPostStatusCode, authAccessToken, authUserId, error] = sendAuthPostRequest(sht, authKeyRowNumber, authValueRowNumber, authMethod);
     //console.log("呼び出し確認完了");
 
     if (error == null) {
-      //console.log("正常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。");
+      //console.log("正常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。");
+      //リクエスト,レスポンスの書き込み
       sht.getRange(authValueRowNumber, 6).setValue(authPostString);
       sht.getRange(authValueRowNumber, 7).setValue(authPostMessage);
       sht.getRange(authValueRowNumber, 8).setValue(authPostStatusCode);
-
+      //認証APIのaccess_token,user_idを書き込み
       sht.getRange(authValueRowNumber, 11).setValue(authAccessToken);
       sht.getRange(authValueRowNumber, 12).setValue(authUserId);
     }
 
     else if (error != null) {
-      //console.log("異常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。");
+      //console.log("異常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。");
+      //リクエスト,レスポンスについて
       sht.getRange(authValueRowNumber, 6).setValue(authPostString);
       sht.getRange(authValueRowNumber, 7).setValue(error);
       sht.getRange(authValueRowNumber, 8).setValue(authPostStatusCode);
-
+      //認証APIのaccess_token,user_idを書き込み
       sht.getRange(authValueRowNumber, 11).setValue(authAccessToken);
       sht.getRange(authValueRowNumber, 12).setValue(authUserId);
     }
@@ -420,44 +395,47 @@ function outputAuthPostToWritten(authId, authMethod, sht, authKeyRowNumber, auth
 }
 
 
-function outputPostToWritten(id, method, sht, keyRowNumber, valueRowNumber, e) {
+//参照APIのPOSTメソッドのリクエスト、レスポンスを認証APIのvalueに書き出し
+function outputPostToWritten(id, method, sht, keyRowNumber, valueRowNumber) {
   if (method == "POST" && id.indexOf("認証") == -1) {
     const [postString, postMessage, postStatusCode, error] = sendPostRequest(sht, keyRowNumber, valueRowNumber, method);
 
     if (error == null) {
-      console.log("正常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。")
+      console.log("正常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。")
       sht.getRange(valueRowNumber, 6).setValue(postString);
       sht.getRange(valueRowNumber, 7).setValue(postMessage);
       sht.getRange(valueRowNumber, 8).setValue(postStatusCode);
     }
 
     else if (error != null) {
-      console.log("異常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。")
+      console.log("異常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。")
       sht.getRange(valueRowNumber, 6).setValue(postString);
       sht.getRange(valueRowNumber, 7).setValue(error);
       sht.getRange(valueRowNumber, 8).setValue(postStatusCode);
-
     }
-
   }
   else {
     console.log("想定外（：参照APIが非POSTメソッド）の処理です。");
   }
 }
 
+
+//参照APIのGET,DELETE,PUTメソッドのリクエスト、レスポンスを認証APIのvalueに書き出し
 function outputNoPostToWritten(id, method, sht, keyRowNumber, valueRowNumber) {
+
+  //GETメソッド、参照APIについて
   if (method == "GET" && id.indexOf("認証") == -1) {
     const [getUrlReference, getMessage, getStatusCode, error] = sendGetRequest(sht, keyRowNumber, valueRowNumber, method);
 
     if (error == null) {
 
-      console.log("正常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。")
-      //sendGetRequest()の返却値：レスポンスメッセージとステータスコードをメイン関数で再利用する。
-      //書き込む処理はmain()で行う。sendXX()はリクエストとログ書き出し。
+      console.log("正常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。")
       sht.getRange(valueRowNumber, 6).setValue(getUrlReference);
       sht.getRange(valueRowNumber, 8).setValue(getStatusCode);
       console.log("実行確認")
       //console.log(typeof(getMessage))
+
+      //セルへの書き出しは50000文字の制限がある。
       if (getMessage.length < 50000) {
         console.log("レスポンスは50000文字以内です。書き出しいたします。")
         sht.getRange(valueRowNumber, 7).setValue(getMessage);
@@ -468,49 +446,47 @@ function outputNoPostToWritten(id, method, sht, keyRowNumber, valueRowNumber) {
         //try~catchでは実装不可だった。スプレッドシート側の問題なのでGASではエラー処理されないっぽい
         console.log("異常を検知しました。レスポンスは50000文字を超えています。\nセルにリクエストを書き出します。レスポンスは書き出せません。")
         sht.getRange(valueRowNumber, 7).setValue("レスポンスが50000文字を超えているためセルに書き出せません。\nログをご確認ください。");
-
       }
     }
 
     else if (error != null) {
-      console.log("異常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。")
+      console.log("異常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。")
       sht.getRange(valueRowNumber, 6).setValue(getUrlReference);
       sht.getRange(valueRowNumber, 7).setValue(error);
       sht.getRange(valueRowNumber, 8).setValue(getStatusCode);
     }
   }
 
+  //PUTメソッド、参照APIについて
   else if (method == "PUT" && id.indexOf("認証") == -1) {
     const [putString, putMessage, putStatusCode, error] = sendPutRequest(sht, keyRowNumber, valueRowNumber, method);
     if (error == null) {
-      console.log("正常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。")
+      console.log("正常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。")
       sht.getRange(valueRowNumber, 6).setValue(putString);
       sht.getRange(valueRowNumber, 7).setValue(putMessage);
       sht.getRange(valueRowNumber, 8).setValue(putStatusCode);
     }
 
     else if (error != null) {
-      console.log("異常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。")
+      console.log("異常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。")
       sht.getRange(valueRowNumber, 6).setValue(putString);
       sht.getRange(valueRowNumber, 7).setValue(error);
       sht.getRange(valueRowNumber, 8).setValue(putStatusCode);
-
     }
-
   }
 
-
+  //DELETEメソッド、参照APIについて
   else if (method == "DELETE" && id.indexOf("認証") == -1) {
     const [deleteString, deleteMessage, deleteStatusCode, error] = sendDeleteRequest(sht, keyRowNumber, valueRowNumber, method);
     if (error == null) {
-      console.log("正常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。")
+      console.log("正常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。")
       sht.getRange(valueRowNumber, 6).setValue(deleteString);
       sht.getRange(valueRowNumber, 7).setValue(deleteMessage);
       sht.getRange(valueRowNumber, 8).setValue(deleteStatusCode);
     }
 
     else if (error != null) {
-      console.log("異常系の処理を行います。\nセルにリクエストとレスポンスを書き出します。")
+      console.log("異常系の処理を行います。\nシートにリクエストとレスポンスを書き出します。")
       sht.getRange(valueRowNumber, 6).setValue(deleteString);
       sht.getRange(valueRowNumber, 7).setValue(error);
       sht.getRange(valueRowNumber, 8).setValue(deleteStatusCode);
@@ -524,30 +500,28 @@ function outputNoPostToWritten(id, method, sht, keyRowNumber, valueRowNumber) {
 }
 
 
-
-//認証APIのPOSTの書き込む処理は別関数で行う。sendXX()はリクエストとログ書き出し。
+//認証APIのPOSTメソッドをリクエストする
 function sendAuthPostRequest(sht, authKeyRowNumber, authValueRowNumber, authMethod) {
   //パラメータのkeyを2次元配列として取得。1次元配列へ変換して配列要素抽出
   const range = sht.getRange(authKeyRowNumber, 13, 1, sht.getLastColumn() - 12)
   const keys2array = range.getValues()
   //Logger.log(keys2array);
-  var keyFlat = keys2array.flat()
+  const keyFlat = keys2array.flat()
   //console.log(keyFlat);
 
   //パラメータの内容valueを2次元配列として取得。1次元配列へ変換して配列要素抽出
   const rangeParam = sht.getRange(authValueRowNumber, 13, 1, sht.getLastColumn() - 12)
   const values2array = rangeParam.getValues()
-  var valueFlat = values2array.flat()
+  const valueFlat = values2array.flat()
 
-  //key-valueの各要素を対応させる
-  //key-valueの二次元配列を作成する
-  var obj2array = [keyFlat, valueFlat];
-
+  //key-valueの各要素を対応させる//key-valueの二次元配列を作成する
+  const obj2array = [keyFlat, valueFlat];
   //console.log(obj2array); 
-  //key-valueの二次元配列から連想配列への変換 
+  //key-valueの二次元配列から連想配列への変換
+
   const keys = obj2array[0];
   const values = obj2array[1];
-  var obj = {};
+  const obj = {};
 
   //入力のあるパラメータを取得.valueが空の時はkeyが削除される
   for (let j = 0; j <= keys.length; j++) {
@@ -556,24 +530,27 @@ function sendAuthPostRequest(sht, authKeyRowNumber, authValueRowNumber, authMeth
     }
     else {
     }
-    //URLを二次元配列で取得
-    const authUrlPost2Array = sht.getRange(authValueRowNumber, 10).getValues();  // G列:URLカラムの全ての行を取得
-
-    //URLの二次元配列を一次元配列に変換
-    var authUrlPostFlat = authUrlPost2Array.flat()
-    //console.log(authUrlPostFlat);
-
-    //URL配列からURLを抽出
-    var authUrlPost = authUrlPostFlat[0];
   }
+  //URLを二次元配列で取得
+  const authUrlPost2Array = sht.getRange(authValueRowNumber, 10).getValues();  // G列:URLカラムの全ての行を取得
 
+  //URLの二次元配列を一次元配列に変換
+  const authUrlPostFlat = authUrlPost2Array.flat()
+  //console.log(authUrlPostFlat);
+
+  //URL配列からURLを抽出
+
+
+  const authUrlPost = authUrlPostFlat[0];
+
+  //console.log(authUrlPost)
 
   //key-value配列のJSON化
-  var authPostString = JSON.stringify(obj, null, "\t")
+  const authPostString = JSON.stringify(obj, null, "\t")
 
 
   //POSTリクエスト　parameter
-  var options = {
+  const options = {
     'method': 'post',
     'contentType': 'application/json',
     // Convert the JavaScript object to a JSON string.
@@ -600,9 +577,6 @@ function sendAuthPostRequest(sht, authKeyRowNumber, authValueRowNumber, authMeth
     //console.log(response.getResponseCode())
     //テスト//Logger.log(idArray);
 
-
-
-
     //認証情報を参照して認証必要なAPIのuser_idとaccess_tokenの列に認証結果を書き出す。
     // レスポンスメッセージをJavaScriptオブジェクトの状態でkeyでフィルタリング可能
     //objectを文字列化して書き出す
@@ -622,7 +596,7 @@ function sendAuthPostRequest(sht, authKeyRowNumber, authValueRowNumber, authMeth
     }
 
 
-    var error = null
+    let error = null
     //リクエストとレスポンスのログ排出
     console.log(authMethod + " " + authPostApi + "についてaccess_tokenとuser_idの組み合わせが" + authPostCombi + "の時、リクエストとレスポンスは以下の通りです。\n※エンドポイント、JSONペイロード、レスポンスメッセージ、ステータスコードの順に記載")
     console.log(authUrlPost);
@@ -636,7 +610,7 @@ function sendAuthPostRequest(sht, authKeyRowNumber, authValueRowNumber, authMeth
   } catch (e) {
     console.log(authMethod + " " + authPostApi + "についてaccess_tokenとuser_idの組み合わせが" + authPostCombi + "の時、リクエストとレスポンスは以下の通りです。\n※エンドポイント、JSONペイロード、レスポンスメッセージ、ステータスコードの順に記載")
     //例外エラー処理
-    var error = JSON.stringify(e.message)
+    let error = JSON.stringify(e.message)
     console.log('Error:' + error)
     return [authPostString, authPostMessage, authPostStatusCode, authAccessToken, authUserId, error];
   }
@@ -646,22 +620,22 @@ function sendAuthPostRequest(sht, authKeyRowNumber, authValueRowNumber, authMeth
 function sendGetRequest(sht, keyRowNumber, valueRowNumber, method) {
   //getvalueでgetrangeの値を取得
   // セル範囲の値（ここではURL）を２次元配列で取得する
-  var urlValue = sht.getRange(valueRowNumber, 10).getValues();
+  const urlValue = sht.getRange(valueRowNumber, 10).getValues();
   // セル範囲の値（ここではURL）を１次元配列に変換する
-  var urlValuesFlat = urlValue.flat()
+  const urlValuesFlat = urlValue.flat()
   //検証//console.log(valuesFlat)
 
   //ログ排出用にapi,組み合わせカラムのバリューを取得する。
-  var getApi = sht.getRange(valueRowNumber, 3).getValue();
-  var getCombi = sht.getRange(valueRowNumber, 5).getValue();
+  const getApi = sht.getRange(valueRowNumber, 3).getValue();
+  const getCombi = sht.getRange(valueRowNumber, 5).getValue();
   //console.log(getApi);
   //console.log(getCombi);
 
   //一次元配列からURLテキスト抽出
   while (urlValuesFlat.length) {
-    var getUrl = urlValuesFlat.shift();
+    const getUrl = urlValuesFlat.shift();
 
-    var options = {
+    const options = {
       'method': 'get',
       "muteHttpExceptions": true,
     }
@@ -706,23 +680,23 @@ function sendPostRequest(sht, keyRowNumber, valueRowNumber, method) {
   const range = sht.getRange(keyRowNumber, 11, 1, sht.getLastColumn() - 10)
   const keys2array = range.getValues()
   //Logger.log(keys2array);
-  var keyFlat = keys2array.flat()
+  const keyFlat = keys2array.flat()
   //console.log(keyFlat);
 
   //パラメータの内容valueを2次元配列として取得。1次元配列へ変換して配列要素抽出
   const rangeParam = sht.getRange(valueRowNumber, 11, 1, sht.getLastColumn() - 10)
   const values2array = rangeParam.getValues()
-  var valueFlat = values2array.flat()
+  const valueFlat = values2array.flat()
 
   //key-valueの各要素を対応させる
   //key-valueの二次元配列を作成する
-  var obj2array = [keyFlat, valueFlat];
+  const obj2array = [keyFlat, valueFlat];
 
   //console.log(obj2array); 
   //key-valueの二次元配列から連想配列への変換 
   const keys = obj2array[0];
   const values = obj2array[1];
-  var obj = {};
+  const obj = {};
 
   //入力のあるパラメータを取得.valueが空の時はkeyが削除される
   for (let j = 0; j <= keys.length; j++) {
@@ -735,7 +709,7 @@ function sendPostRequest(sht, keyRowNumber, valueRowNumber, method) {
     const urlPost2Array = sht.getRange(valueRowNumber, 10).getValues();  // G列:URLカラムの全ての行を取得
 
     //URLの二次元配列を一次元配列に変換
-    var urlPostFlat = urlPost2Array.flat()
+    const urlPostFlat = urlPost2Array.flat()
     //console.log(urlPostFlat);
 
     //URL配列からURLを抽出
@@ -744,11 +718,11 @@ function sendPostRequest(sht, keyRowNumber, valueRowNumber, method) {
 
 
   //key-value配列のJSON化
-  var postString = JSON.stringify(obj, null, "\t")
+  const postString = JSON.stringify(obj, null, "\t")
 
 
   //POSTリクエスト　parameter
-  var options = {
+  const options = {
     'method': 'post',
     'contentType': 'application/json',
     // Convert the JavaScript object to a JSON string.
@@ -800,23 +774,23 @@ function sendPutRequest(sht, keyRowNumber, valueRowNumber, method) {
   const range = sht.getRange(keyRowNumber, 11, 1, sht.getLastColumn() - 10)
   const keys2array = range.getValues()
   //Logger.log(keys2array);
-  var keyFlat = keys2array.flat()
+  const keyFlat = keys2array.flat()
   //console.log(keyFlat);
 
   //パラメータの内容valueを2次元配列として取得。1次元配列へ変換して配列要素抽出
   const rangeParam = sht.getRange(valueRowNumber, 11, 1, sht.getLastColumn() - 10)
   const values2array = rangeParam.getValues()
-  var valueFlat = values2array.flat()
+  const valueFlat = values2array.flat()
 
   //key-valueの各要素を対応させる
   //key-valueの二次元配列を作成する
-  var obj2array = [keyFlat, valueFlat];
+  const obj2array = [keyFlat, valueFlat];
 
   //console.log(obj2array); 
   //key-valueの二次元配列から連想配列への変換 
   const keys = obj2array[0];
   const values = obj2array[1];
-  var obj = {};
+  const obj = {};
 
   //入力のあるパラメータを取得.valueが空の時はkeyが削除される
   for (let j = 0; j <= keys.length; j++) {
@@ -829,7 +803,7 @@ function sendPutRequest(sht, keyRowNumber, valueRowNumber, method) {
     const urlPut2Array = sht.getRange(valueRowNumber, 10).getValues();  // G列:URLカラムの全ての行を取得
 
     //URLの二次元配列を一次元配列に変換
-    var urlPutFlat = urlPut2Array.flat()
+    const urlPutFlat = urlPut2Array.flat()
     //console.log(urlPostFlat);
 
     //URL配列からURLを抽出
@@ -838,10 +812,10 @@ function sendPutRequest(sht, keyRowNumber, valueRowNumber, method) {
 
 
   //key-value配列のJSON化
-  var putString = JSON.stringify(obj, null, "\t")
+  const putString = JSON.stringify(obj, null, "\t")
 
   //PUTリクエスト　parameter
-  var options = {
+  const options = {
     'method': 'put',
     'contentType': 'application/json',
     // Convert the JavaScript object to a JSON string.
@@ -892,23 +866,23 @@ function sendDeleteRequest(sht, keyRowNumber, valueRowNumber, method) {
   const range = sht.getRange(keyRowNumber, 11, 1, sht.getLastColumn() - 10)
   const keys2array = range.getValues()
   //Logger.log(keys2array);
-  var keyFlat = keys2array.flat()
+  const keyFlat = keys2array.flat()
   //console.log(keyFlat);
 
   //パラメータの内容valueを2次元配列として取得。1次元配列へ変換して配列要素抽出
   const rangeParam = sht.getRange(valueRowNumber, 11, 1, sht.getLastColumn() - 10)
   const values2array = rangeParam.getValues()
-  var valueFlat = values2array.flat()
+  const valueFlat = values2array.flat()
 
   //key-valueの各要素を対応させる
   //key-valueの二次元配列を作成する
-  var obj2array = [keyFlat, valueFlat];
+  const obj2array = [keyFlat, valueFlat];
 
   //console.log(obj2array); 
   //key-valueの二次元配列から連想配列への変換 
   const keys = obj2array[0];
   const values = obj2array[1];
-  var obj = {};
+  const obj = {};
 
   //入力のあるパラメータを取得.valueが空の時はkeyが削除される
   for (let j = 0; j <= keys.length; j++) {
@@ -921,7 +895,7 @@ function sendDeleteRequest(sht, keyRowNumber, valueRowNumber, method) {
     const urlDelete2Array = sht.getRange(valueRowNumber, 10).getValues();  // G列:URLカラムの全ての行を取得
 
     //URLの二次元配列を一次元配列に変換
-    var urlDeleteFlat = urlDelete2Array.flat()
+    const urlDeleteFlat = urlDelete2Array.flat()
     //console.log(urlDeleteFlat);
 
     //URL配列からURLを抽出
@@ -930,10 +904,10 @@ function sendDeleteRequest(sht, keyRowNumber, valueRowNumber, method) {
 
 
   //key-value配列のJSON化
-  var deleteString = JSON.stringify(obj, null, "\t")
+  const deleteString = JSON.stringify(obj, null, "\t")
 
   //DELETEリクエスト　parameter
-  var options = {
+  const options = {
     'method': 'delete',
     'contentType': 'application/json',
     // Convert the JavaScript object to a JSON string.
